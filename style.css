@@ -612,7 +612,7 @@ body.light-theme .wordmark {
 .credibility-block {
   position: absolute;
   bottom: 40px;
-  right: 40px;
+  left: 40px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -698,7 +698,7 @@ body.light-theme .wordmark {
 .scroll-indicator {
   position: absolute;
   bottom: 40px;
-  left: 40px;
+  right: 40px;
   width: 38px;
   height: 38px;
   border-radius: 50%;
@@ -973,7 +973,8 @@ body.light-theme .wordmark {
   }
 
   .credibility-block {
-    right: 20px;
+    left: 20px;
+    right: auto;
     width: auto;
     max-width: calc(100vw - 40px);
   }
@@ -983,7 +984,8 @@ body.light-theme .wordmark {
   }
 
   .scroll-indicator {
-    left: 20px;
+    left: auto;
+    right: 20px;
   }
 
   .cookie-banner {
