@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auroze | Creative Digital Agency</title>
+  <meta name="description"
+    content="Auroze is a creative digital agency building websites, AI products, brands, and systems built for clarity, scale and impact.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Outfit:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- GSAP & ScrollTrigger Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+</head>
+
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <div id="webgl-container"></div>
+
+  <div class="centerpiece-logo-wrapper">
+    <div class="centerpiece-logo">
+      <svg class="centerpiece-logo-svg" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="silver-grad-cp" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c0c0c0" />
+            <stop offset="25%" stop-color="#ffffff" />
+            <stop offset="50%" stop-color="#a8a8a8" />
+            <stop offset="75%" stop-color="#e8e8e8" />
+            <stop offset="100%" stop-color="#c0c0c0" />
+          </linearGradient>
+          <linearGradient id="shine-grad-cp" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+            <stop offset="50%" stop-color="rgba(255,255,255,0.75)" />
+            <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+          </linearGradient>
+          <clipPath id="logo-clip-cp">
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+              fill-rule="evenodd" />
+          </clipPath>
+        </defs>
+
+        <path
+          d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+          fill="url(#silver-grad-cp)" fill-rule="evenodd" />
+
+        <g clip-path="url(#logo-clip-cp)">
+          <rect class="shine-bar" x="-600" y="-100" width="500" height="1200" fill="url(#shine-grad-cp)" />
+        </g>
+      </svg>
+      <span class="centerpiece-wordmark">AUROZE<span class="registered">®</span></span>
+    </div>
+  </div>
+
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <div class="logo">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="silver-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c0c0c0" />
+                <stop offset="25%" stop-color="#ffffff" />
+                <stop offset="50%" stop-color="#a8a8a8" />
+                <stop offset="75%" stop-color="#e8e8e8" />
+                <stop offset="100%" stop-color="#c0c0c0" />
+              </linearGradient>
+
+              <clipPath id="logo-clip-hdr">
+                <path
+                  d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+                  fill-rule="evenodd" />
+              </clipPath>
+
+              <linearGradient id="shine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.75)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+              </linearGradient>
+            </defs>
+
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+              fill="url(#silver-grad)" fill-rule="evenodd" />
+
+            <g clip-path="url(#logo-clip-hdr)">
+              <rect class="shine-bar" x="-600" y="-100" width="500" height="1200" fill="url(#shine-grad)" />
+            </g>
+          </svg>
+          <canvas id="logo-sparks-canvas"></canvas>
+        </div>
+        <span class="wordmark">AUROZE<span class="registered">®</span></span>
+      </div>
+    </div>
+
+    <div class="top-bar-right">
+      <button class="sound-toggle" aria-label="Toggle ambient audio">
+        <svg class="sound-icon sound-on hidden" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
+            fill="currentColor" />
+        </svg>
+        <svg class="sound-icon sound-off" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"
+            fill="currentColor" />
+        </svg>
+      </button>
+
+      <a href="#contact" class="cta-talk">LET'S TALK</a>
+
+      <button class="menu-toggle" aria-label="Open menu">
+        <span>MENU</span>
+        <div class="hamburger">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <main class="hero-section">
+    <div class="hero-content">
+      <h1 class="hero-headline">
+        Designed to<br>
+        mean <span id="morphing-word" class="word-morph">power</span>
+      </h1>
+
+      <a href="#project" class="cta-project">
+        <span class="cta-text">START A PROJECT</span>
+        <span class="cta-arrow">→</span>
+        <span class="underline-line"></span>
+      </a>
+    </div>
+
+    <div class="credibility-block">
+      <div class="credibility-card">
+        <div class="card-left">
+          <svg class="globe-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" stroke-dasharray="2 2" />
+            <ellipse cx="12" cy="12" rx="4" ry="10" stroke="currentColor" stroke-width="1" />
+            <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1" />
+            <path d="M12 2v20" stroke="currentColor" stroke-width="1" />
+          </svg>
+          <span class="est-text">EST. 2012</span>
+        </div>
+        <div class="card-right">
+          <span>14+ YEARS SHAPING<br>DIGITAL DIRECTION.</span>
+        </div>
+      </div>
+      <p class="credibility-desc">
+        Websites, AI products, brands, and systems built for clarity, scale and impact.
+      </p>
+    </div>
+
+    <a href="#about" class="scroll-indicator" aria-label="Scroll down">
+      <svg class="scroll-arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 4v16M12 20l-6-6M12 20l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round" />
+      </svg>
+    </a>
+  </main>
+
+  <section class="about-section" id="about">
+    <div class="about-glow-blob"></div>
+
+    <div class="about-backdrop">
+      <div class="wireframe-slab slab-1"></div>
+      <div class="wireframe-slab slab-2"></div>
+      <div class="wireframe-slab slab-3"></div>
+      <div class="wireframe-slab slab-4"></div>
+    </div>
+
+    <div class="about-decorations">
+      <svg class="spark-line-svg" viewBox="0 0 200 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 0 200 C 40 180, 80 120, 200 0" stroke="var(--accent-orange)" stroke-width="1.5" fill="none"
+          opacity="0.3" />
+        <circle cx="200" cy="0" r="3" fill="var(--accent-orange)" />
+      </svg>
+    </div>
+
+    <div class="about-eyebrow">ABOUT</div>
+
+    <div class="about-statement-container">
+      <h2 class="about-statement">
+        <span class="statement-line line-1">
+          <span class="scroll-word">Auroze</span>
+          <span class="scroll-word">is</span>
+          <span class="scroll-word">an</span>
+          <span class="scroll-word">independent</span>
+          <span class="scroll-word">digital</span>
+          <span class="scroll-word">studio</span>
+        </span>
+        <span class="statement-line line-2">
+          <span class="scroll-word">crafting</span>
+          <span class="scroll-word">meaningful</span>
+          <span class="scroll-word">brand</span>
+          <span class="scroll-word">experiences</span>
+          <span class="scroll-word">through</span>
+        </span>
+        <span class="statement-line line-3">
+          <span class="scroll-word">strategy,</span>
+          <span class="scroll-word">design,</span>
+          <span class="scroll-word">and</span>
+          <span class="scroll-word">technology.</span>
+        </span>
+      </h2>
+    </div>
+
+    <div class="about-columns-container">
+      <div class="column-left">
+        <div class="slogan-line">WE DESIGN FOR LONGEVITY</div>
+        <div class="slogan-line">CLARITY FIRST, CRAFT ALWAYS,</div>
+        <div class="slogan-line">BUILT TO SCALE.</div>
+      </div>
+      <div class="column-right">
+        <p class="mission-paragraph">
+          Our mission is to make technology feel human by designing digital products that are intuitive, purposeful, and
+          meaningful to people.
+        </p>
+        <a href="#about-more" class="cta-about-more">
+          <span class="cta-about-text">MORE ABOUT US</span>
+          <span class="cta-about-arrow">→</span>
+          <span class="underline-line"></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEY FACTS (THIRD SCREEN) - Pinned Stack Section -->
+  <section class="key-facts-section" id="facts">
+    <div class="key-facts-container">
+      <div class="facts-eyebrow">KEY FACTS</div>
+
+      <div class="facts-layout">
+        <!-- Left Side: Fixed Column -->
+        <div class="facts-left-col">
+          <h2 class="facts-headline">
+            Numbers that<br>
+            <span>define our design</span>
+          </h2>
+          <p class="facts-subtext">
+            Every digit holds a story of trust, meticulous craft, and business-altering results. We don't just shape pixels; we build systems designed to scale and endure.
+          </p>
+          
+          <!-- Bottom-Left Pagination Indicator -->
+          <div class="facts-pagination">
+            <span class="pag-label">ACTIVE</span>
+            <div class="pag-num-container">
+              <div class="pag-num-slider">
+                <div>01</div>
+                <div>02</div>
+                <div>03</div>
+                <div>04</div>
+                <div>05</div>
+              </div>
+            </div>
+            <div class="pag-progress-line">
+              <div class="pag-progress-fill"></div>
+            </div>
+            <div class="pag-total">05</div>
+          </div>
+        </div>
+
+        <!-- Right Side: Card Deck Stack -->
+        <div class="facts-right-col">
+          <div class="card-deck">
+            
+            <!-- Card 1: Featured & Awards -->
+            <div class="key-fact-card" data-index="1">
+              <div class="card-header">
+                <span>FEATURED & AWARDS</span>
+                <span class="card-index">01</span>
+              </div>
+              <div class="card-body">
+                <div class="video-container">
+                  <!-- Auto-playing muted video loop (spinning award trophy) -->
+                  <video class="card-video" src="https://cdn.pixabay.com/video/2021/04/12/70868-537449552_tiny.mp4" autoplay loop muted playsinline></video>
+                  <div class="video-overlay-effects">
+                    <div class="scanner-line"></div>
+                    <div class="scan-grid"></div>
+                  </div>
+                </div>
+                <div class="card-caption">
+                  FEATURED ON TOP DESIGN PLATFORMS WORLDWIDE
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="logos-row">
+                  <span class="logo-item">Awwwards</span>
+                  <span class="logo-item">CSSDA</span>
+                  <span class="logo-item">The FWA</span>
+                  <span class="logo-item">CSSWinner</span>
+                  <span class="logo-item">A' Design</span>
+                  <span class="logo-item">GSAP</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Projects Completed -->
+            <div class="key-fact-card" data-index="2">
+              <div class="card-header">
+                <span>PROJECTS COMPLETED</span>
+                <span class="card-index">02</span>
+              </div>
+              <div class="card-body centered-body">
+                <div class="starburst-decor">
+                  <!-- Matte black rotating spiced-flower / starburst SVG -->
+                  <svg class="starburst-svg" viewBox="0 0 200 200">
+                    <defs>
+                      <radialGradient id="spiked-grad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#14151a" />
+                        <stop offset="60%" stop-color="#0c0d10" />
+                        <stop offset="100%" stop-color="#040508" />
+                      </radialGradient>
+                    </defs>
+                    <g class="starburst-ring-outer">
+                      <polygon points="100,10 108,70 170,100 108,130 100,190 92,130 30,100 92,70" fill="url(#spiked-grad)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5" />
+                      <polygon points="100,20 106,75 160,100 106,125 100,180 94,125 40,100 94,75" fill="url(#spiked-grad)" stroke="rgba(255, 95, 0, 0.2)" stroke-width="1" transform="rotate(22.5 100 100)" />
+                      <polygon points="100,30 105,80 150,100 105,120 100,170 95,120 50,100 95,80" fill="url(#spiked-grad)" stroke="rgba(255, 255, 255, 0.04)" stroke-width="1" transform="rotate(45 100 100)" />
+                      <polygon points="100,40 104,85 140,100 104,115 100,160 96,115 60,100 96,85" fill="url(#spiked-grad)" stroke="rgba(255, 95, 0, 0.1)" stroke-width="1" transform="rotate(67.5 100 100)" />
+                    </g>
+                    <circle cx="100" cy="100" r="10" fill="#040508" stroke="rgba(255, 95, 0, 0.5)" stroke-width="1" />
+                  </svg>
+                </div>
+                <div class="giant-num">050+</div>
+                <div class="card-caption">
+                  CRAFTED DIGITAL PRODUCTS BUILT FOR LONGEVITY
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3: Client Retention / Hours -->
+            <div class="key-fact-card card-3-flip-container" data-index="3">
+              <div class="card-3-inner">
+                <!-- Front Side: 1.5K+ Hour stat -->
+                <div class="card-face card-front">
+                  <div class="card-header">
+                    <span>CLIENT RETENTION</span>
+                    <span class="card-index">03</span>
+                  </div>
+                  <div class="card-body centered-body">
+                    <div class="giant-num">01.5K+</div>
+                    <div class="card-caption">
+                      HOURS OF DIRECT CLIENT COLLABORATION & SUPPORT
+                    </div>
+                  </div>
+                </div>
+                <!-- Back Side: 90% repeat client stat -->
+                <div class="card-face card-back">
+                  <div class="card-header">
+                    <span>CLIENT RETENTION</span>
+                    <span class="card-index">03</span>
+                  </div>
+                  <div class="card-body centered-body">
+                    <div class="giant-num orange-accent-text">90%</div>
+                    <div class="card-caption">
+                      OF CLIENTS CHOOSE AUROZE FOR SUBSEQUENT RELEASES
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4: Team Members -->
+            <div class="key-fact-card" data-index="4">
+              <div class="card-header">
+                <span>TEAM MEMBERS</span>
+                <span class="card-index">04</span>
+              </div>
+              <div class="card-body">
+                <div class="team-slider-wrapper">
+                  <div class="team-track">
+                    <img class="team-slide-img active" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=350&h=350&q=80" alt="Creative Lead">
+                    <img class="team-slide-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=350&h=350&q=80" alt="Technical Architect">
+                    <img class="team-slide-img" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=350&h=350&q=80" alt="Interaction Designer">
+                  </div>
+                  <div class="avatar-shading"></div>
+                </div>
+                <div class="card-caption">
+                  DIFFERENT SKILLS. ONE STANDARD.
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5: Business Partners -->
+            <div class="key-fact-card" data-index="5">
+              <div class="card-header">
+                <span>BUSINESS PARTNERS</span>
+                <span class="card-index">05</span>
+              </div>
+              <div class="card-body centered-body">
+                <div class="giant-num">020+</div>
+                <div class="card-caption">
+                  TRUSTED STRATEGIC PARTNERS ACROSS ENTERPRISE & TECH
+                </div>
+              </div>
+              <div class="card-footer partner-footer">
+                <div class="partner-marquee">
+                  <div class="marquee-track">
+                    <span>GOOGLE</span>
+                    <span>APPLE</span>
+                    <span>STRIPE</span>
+                    <span>NETFLIX</span>
+                    <span>META</span>
+                    <span>GSAP</span>
+                    <span>AMAZON</span>
+                    <!-- Duplicate for seamless scroll -->
+                    <span>GOOGLE</span>
+                    <span>APPLE</span>
+                    <span>STRIPE</span>
+                    <span>NETFLIX</span>
+                    <span>META</span>
+                    <span>GSAP</span>
+                    <span>AMAZON</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELECTED WORK (FOURTH SCREEN) - Horizontal Scroll Section -->
+  <section class="selected-work-section" id="work">
+    <!-- Blueprint grid hairline running down -->
+    <div class="work-hairline"></div>
+
+    <div class="work-horizontal-container">
+      <div class="work-horizontal-track">
+        
+        <!-- Intro Slide (Left portion of horizontal track) -->
+        <div class="work-slide intro-slide">
+          <div class="intro-slide-content">
+            <h2 class="work-headline">
+              Selected work<br>
+              <span>& explorations</span>
+            </h2>
+            <a href="/work" class="cta-view-all">
+              <span class="cta-text">VIEW ALL PROJECTS</span>
+              <span class="cta-arrow">→</span>
+              <span class="underline-line"></span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Project 1: MyWorker AI -->
+        <div class="work-slide project-slide">
+          <a href="https://auroze.com/work/myworker-ai" class="project-card-link">
+            <div class="project-card">
+              <div class="project-media myworker-media">
+                <div class="mini-site-nav">
+                  <span class="mini-logo">myworker.ai</span>
+                  <span class="mini-tagline">BOOST YOUR WORKFORCE WITH AI DIGITAL WORKERS</span>
+                </div>
+                <div class="mini-site-hero">
+                  <div class="alex-greeting">Hi, I'm Alex.</div>
+                </div>
+                <div class="mini-site-grid"></div>
+              </div>
+              <div class="project-info">
+                <div class="project-title-row">
+                  <h3 class="project-title">MyWorker AI</h3>
+                </div>
+                <div class="project-desc-row">
+                  <p class="project-caption">AI platform simplifying hiring, management, and workforce scaling.</p>
+                  <div class="cta-explore">
+                    <span>EXPLORE PROJECT</span>
+                    <span class="cta-arrow">→</span>
+                    <span class="underline-line"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Project 2: Pulse Studio -->
+        <div class="work-slide project-slide">
+          <a href="https://auroze.com/work/pulse-studio" class="project-card-link">
+            <div class="project-card">
+              <div class="project-media pulse-media">
+                <div class="mini-site-nav">
+                  <span class="mini-logo">Pulse Studio®</span>
+                  <div class="mini-nav-links">
+                    <span>Let's Talk</span>
+                    <span>Menu ≡</span>
+                  </div>
+                </div>
+                <div class="mini-site-hero">
+                  <div class="sound-chip">{ Enter the Sound }</div>
+                  <!-- Floating labels -->
+                  <div class="floating-chip chip-1">Rising Waves</div>
+                  <div class="floating-chip chip-2">Aurora</div>
+                  <div class="floating-chip chip-3">Soundscapes</div>
+                  <div class="floating-chip chip-4">Indigo Nights</div>
+                </div>
+                <div class="pulse-headline">
+                  An Independent Music ♪ Studio Shaped by Sound ◉, Built to Move Culture.
+                </div>
+              </div>
+              <div class="project-info">
+                <div class="project-title-row">
+                  <h3 class="project-title">Pulse Studio</h3>
+                </div>
+                <div class="project-desc-row">
+                  <p class="project-caption">A motion-led studio website showcasing artists, projects, and culture.</p>
+                  <div class="cta-explore">
+                    <span>EXPLORE PROJECT</span>
+                    <span class="cta-arrow">→</span>
+                    <span class="underline-line"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Project 3: Loftloom -->
+        <div class="work-slide project-slide">
+          <a href="https://auroze.com/work/loftloom" class="project-card-link">
+            <div class="project-card">
+              <div class="project-media loftloom-media">
+                <div class="mini-site-nav">
+                  <span class="mini-logo">Loftloom</span>
+                </div>
+                <div class="mini-site-hero">
+                  <div class="luxury-headline">LIVE LIFE IN LUXURY</div>
+                  <!-- Floating agent card -->
+                  <div class="real-estate-card">
+                    <div class="re-price">$4,850,000</div>
+                    <div class="re-details">4 Beds | 5 Baths | Bel Air, CA</div>
+                    <div class="re-badge">ACTIVE</div>
+                  </div>
+                </div>
+              </div>
+              <div class="project-info">
+                <div class="project-title-row">
+                  <h3 class="project-title">Loftloom</h3>
+                </div>
+                <div class="project-desc-row">
+                  <p class="project-caption">Seamless real estate platform for effortless property discovery.</p>
+                  <div class="cta-explore">
+                    <span>EXPLORE PROJECT</span>
+                    <span class="cta-arrow">→</span>
+                    <span class="underline-line"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION A: OUR SERVICES -->
+  <section class="services-section" id="services">
+    <div class="services-dark-overlay"></div>
+    <div class="services-smoke-overlay"></div>
+
+    <div class="services-container">
+      <div class="services-eyebrow">OUR SERVICES</div>
+
+      <!-- Poster State (Light/Charcoal theme centered text) -->
+      <div class="services-poster">
+        <div class="poster-text">A.I. / DESIGN / DEVELOPMENT / BRANDING</div>
+        <div class="poster-cta">VIEW SERVICES →</div>
+      </div>
+
+      <!-- Settled Dark Centerpiece Slab -->
+      <div class="services-centerpiece">
+        <!-- CSS 3D rotating craggy stone slab -->
+        <div class="stone-slab-wrapper">
+          <div class="stone-slab">
+            <div class="slab-face slab-front">
+              <!-- Carved Auroze Logo -->
+              <svg class="slab-carved-logo" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z" fill-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="slab-face slab-back"></div>
+            <div class="slab-face slab-left"></div>
+            <div class="slab-face slab-right"></div>
+            <div class="slab-face slab-top"></div>
+            <div class="slab-face slab-bottom"></div>
+          </div>
+        </div>
+
+        <!-- Scattered glyphs orbiting the slab -->
+        <div class="services-letter-fragments">
+          <span class="floating-glyph depth-1">I</span>
+          <span class="floating-glyph depth-2">O</span>
+          <span class="floating-glyph depth-3">S</span>
+          <span class="floating-glyph depth-1">N</span>
+          <span class="floating-glyph depth-2">B</span>
+          <span class="floating-glyph depth-3">Z</span>
+          <span class="floating-glyph depth-1">E</span>
+          <span class="floating-glyph depth-2">A</span>
+        </div>
+
+        <!-- Giant emerging letter A (hinting at next slide / auroze theme) -->
+        <div class="emerging-letter">A</div>
+      </div>
+
+      <div class="services-tagline">✦ DIFFERENT DISCIPLINES. ONE STANDARD OF CRAFT.</div>
+      
+      <a href="/services" class="cta-services-footer">
+        <span class="cta-text">VIEW SERVICES</span>
+        <span class="cta-arrow">→</span>
+        <span class="underline-line"></span>
+      </a>
+    </div>
+  </section>
+
+  <!-- SHUTTER WIPE TRANSITION -->
+  <div class="shutter-wipe">
+    <div class="shutter-bar"></div>
+    <div class="shutter-bar"></div>
+    <div class="shutter-bar"></div>
+    <div class="shutter-bar"></div>
+  </div>
+
+  <!-- SECTION B: CLIENT STORIES -->
+  <section class="stories-section" id="stories">
+    <div class="stories-container">
+      <div class="stories-header-row">
+        <h2 class="stories-headline">Client stories</h2>
+        <div class="stories-intro">
+          Great work is built through partnership. Here's what<br>our clients say.
+        </div>
+      </div>
+
+      <div class="testimonials-container">
+        <!-- Testimonial 1 -->
+        <div class="testimonial-card">
+          <blockquote class="testimonial-quote">
+            "Auroze redefined our entire digital platform. Their craft and execution brought a level of clarity and scale we didn't think was possible."
+          </blockquote>
+          <div class="testimonial-author">
+            <span class="author-name">ALEX VERMEULEN</span>
+            <span class="author-role">DESIGN DIRECTOR, METAVERSE</span>
+          </div>
+        </div>
+
+        <!-- Testimonial 2 -->
+        <div class="testimonial-card">
+          <blockquote class="testimonial-quote">
+            "Every phase of our partnership was built on trust and a shared standard of craft. The results speak for themselves."
+          </blockquote>
+          <div class="testimonial-author">
+            <span class="author-name">SARAH CHEN</span>
+            <span class="author-role">VP OF PRODUCT, STRIPE</span>
+          </div>
+        </div>
+
+        <!-- Testimonial 3 -->
+        <div class="testimonial-card">
+          <blockquote class="testimonial-quote">
+            "They designed a system that was built to scale and endure. Working with them was an absolute game changer."
+          </blockquote>
+          <div class="testimonial-author">
+            <span class="author-name">MARCUS AURELIUS</span>
+            <span class="author-role">CREATIVE DIRECTOR, MONOLITH</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION C: EXPLORATIONS / DRIBBBLE GALLERY -->
+  <section class="explorations-section" id="journal">
+    <div class="explorations-container">
+      
+      <!-- Masonry Collage -->
+      <div class="explorations-collage">
+        
+        <!-- Card 1: Loose Sketches -->
+        <div class="collage-card card-sketches">
+          <div class="card-image-bg" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80')"></div>
+          <div class="card-inner-overlay">
+            <span class="card-badge">AI</span>
+            <div class="card-title-main">LOOSE SKETCHES TO VISUALIZATIONS</div>
+            <span class="card-copyright">©️</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Website Mockup Card -->
+        <div class="collage-card card-mockup">
+          <div class="card-image-bg" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80')"></div>
+          <div class="card-inner-overlay">
+            <span class="card-badge">WEB</span>
+            <div class="card-title-main">WE BRING IMAGINATION TO LIFE.</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Swank Branding -->
+        <div class="collage-card card-swank">
+          <div class="card-image-bg" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80')"></div>
+          <div class="card-inner-overlay">
+            <span class="card-brand">SWANK®</span>
+            <span class="card-microcopy">STYLE DEFINES CHARACTER</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="explorations-footer-row">
+        <p class="explorations-caption">
+          Concepts, explorations, and interface experiments shared openly as part of our creative process.
+        </p>
+        <a href="https://dribbble.com/auroze" class="cta-dribbble" target="_blank" rel="noopener noreferrer">
+          <span class="cta-text">VIEW ON DRIBBBLE</span>
+          <span class="cta-arrow">→</span>
+          <span class="underline-line"></span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION D: FOOTER -->
+  <footer class="footer-section" id="contact">
+    <div class="footer-smoke-overlay"></div>
+
+    <div class="footer-container">
+      <div class="footer-top-row">
+        <h2 class="footer-headline">
+          Ready to build<br>
+          something bold?
+        </h2>
+        
+        <a href="mailto:hello@auroze.com" class="cta-collab">
+          <span class="cta-text">START A COLLABORATION</span>
+          <span class="cta-arrow">→</span>
+          <span class="underline-line"></span>
+        </a>
+      </div>
+
+      <div class="footer-middle-row">
+        <!-- Left Column -->
+        <div class="footer-left-col">
+          <div class="footer-copyright">©️AUROZE®️ 2026</div>
+          <div class="footer-instruction">SOUND ON ♪ HOVER THE LINES.</div>
+        </div>
+
+        <!-- Right Columns -->
+        <div class="footer-right-col">
+          <div class="footer-info-col">
+            <div class="info-label">BUSINESS ENQUIRY</div>
+            <div class="info-val">
+              <span class="prefix">E.</span> hello@auroze.com
+            </div>
+            <div class="info-val">
+              <span class="prefix">P.</span> +91 98241 82099
+            </div>
+          </div>
+
+          <div class="footer-info-col">
+            <div class="info-label">SOCIAL</div>
+            <div class="social-grid">
+              <a href="https://linkedin.com/company/auroze" target="_blank" rel="noopener noreferrer">Linkedin</a>
+              <a href="https://facebook.com/auroze" target="_blank" rel="noopener noreferrer">Facebook</a>
+              <a href="https://dribbble.com/auroze" target="_blank" rel="noopener noreferrer">Dribbble</a>
+              <a href="https://instagram.com/auroze" target="_blank" rel="noopener noreferrer">Instagram</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM HALF: Giant interactive line-art wordmark -->
+      <div class="footer-wordmark-container">
+        <canvas id="footer-lines-canvas"></canvas>
+      </div>
+
+    </div>
+  </footer>
+
+  <div class="cookie-banner" id="cookie-banner">
+    <span class="cookie-text">WE USE COOKIES TO ENHANCE YOUR EXPERIENCE.</span>
+    <div class="cookie-actions">
+      <button class="cookie-btn btn-decline" id="cookie-decline">DECLINE</button>
+      <button class="cookie-btn btn-accept" id="cookie-accept">ACCEPT</button>
+    </div>
+  </div>
+
+  <div class="menu-overlay" id="menu-overlay">
+    <div class="overlay-background"></div>
+    <div class="overlay-header">
+      <div class="logo">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="silver-grad-ov" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c0c0c0" />
+                <stop offset="25%" stop-color="#ffffff" />
+                <stop offset="50%" stop-color="#a8a8a8" />
+                <stop offset="75%" stop-color="#e8e8e8" />
+                <stop offset="100%" stop-color="#c0c0c0" />
+              </linearGradient>
+
+              <clipPath id="logo-clip-ov">
+                <path
+                  d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+                  fill-rule="evenodd" />
+              </clipPath>
+
+              <linearGradient id="shine-grad-ov" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.7)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+              fill="url(#silver-grad-ov)" fill-rule="evenodd" />
+            <g clip-path="url(#logo-clip-ov)">
+              <rect class="shine-bar" x="-600" y="-100" width="500" height="1200" fill="url(#shine-grad-ov)" />
+            </g>
+          </svg>
+        </div>
+        <span class="wordmark">AUROZE</span>
+      </div>
+      <button class="menu-close" id="menu-close" aria-label="Close menu">
+        <span>CLOSE</span>
+        <div class="close-icon">
+          <span class="cross cross-1"></span>
+          <span class="cross cross-2"></span>
+        </div>
+      </button>
+    </div>
+
+    <nav class="overlay-nav">
+      <ul>
+        <li><a href="#work" class="nav-item" data-bg-img="work"><span class="nav-number">01</span> <span
+              class="nav-label">WORK</span></a></li>
+        <li><a href="#about" class="nav-item" data-bg-img="about"><span class="nav-number">02</span> <span
+              class="nav-label">ABOUT</span></a></li>
+        <li><a href="#services" class="nav-item" data-bg-img="services"><span class="nav-number">03</span> <span
+              class="nav-label">SERVICES</span></a></li>
+        <li><a href="#contact" class="nav-item" data-bg-img="contact"><span class="nav-number">04</span> <span
+              class="nav-label">CONTACT</span></a></li>
+        <li><a href="#journal" class="nav-item" data-bg-img="journal"><span class="nav-number">05</span> <span
+              class="nav-label">JOURNAL</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="overlay-footer">
+      <div class="social-links">
+        <a href="#twitter" class="social-item">TWITTER</a>
+        <a href="#instagram" class="social-item">INSTAGRAM</a>
+        <a href="#linkedin" class="social-item">LINKEDIN</a>
+        <a href="#behance" class="social-item">BEHANCE</a>
+      </div>
+      <div class="office-location">
+        <span>CREATIVE OUTPOST — NY / LON / BLR</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+
+</html>

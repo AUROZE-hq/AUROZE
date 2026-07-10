@@ -1,0 +1,11 @@
+{
+  "name": "auroze-landing-page",
+  "version": "1.0.0",
+  "description": "Auroze Creative Digital Agency Hero Section",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y serve",
+    "start": "npx -y serve"
+  },
+  "dependencies": {}
+}
