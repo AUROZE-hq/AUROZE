@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auroze | Digital Services</title>
+  <meta name="description"
+    content="Auroze provides web development, mobile apps, software systems, POS solutions, digital marketing, branding, automation and creative services to help businesses grow.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Outfit:wght@300;400;500;700;800&family=Great+Vibes&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="services.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+</head>
+
+<body class="services-page">
+
+  <div class="svc-scroll-progress" aria-hidden="true">
+    <div class="svc-scroll-progress-bar"></div>
+  </div>
+
+  <div class="svc-cursor-glow" aria-hidden="true"></div>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <header class="top-bar svc-top-bar">
+    <div class="top-bar-left">
+      <a href="index.html" class="logo" aria-label="Auroze Home">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="silver-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c0c0c0" />
+                <stop offset="25%" stop-color="#ffffff" />
+                <stop offset="50%" stop-color="#a8a8a8" />
+                <stop offset="75%" stop-color="#e8e8e8" />
+                <stop offset="100%" stop-color="#c0c0c0" />
+              </linearGradient>
+              <clipPath id="logo-clip-hdr">
+                <path
+                  d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+                  fill-rule="evenodd" />
+              </clipPath>
+              <linearGradient id="shine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.75)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+              fill="url(#silver-grad)" fill-rule="evenodd" />
+            <g clip-path="url(#logo-clip-hdr)">
+              <rect class="shine-bar" x="-600" y="-100" width="500" height="1200" fill="url(#shine-grad)" />
+            </g>
+          </svg>
+          <canvas id="logo-sparks-canvas"></canvas>
+        </div>
+        <span class="wordmark">AUROZE<span class="registered">®</span></span>
+      </a>
+    </div>
+
+    <nav class="top-bar-center top-bar-nav" aria-label="Primary navigation">
+      <a href="about.html" class="top-nav-link">ABOUT</a>
+      <a href="services.html" class="top-nav-link is-active">SERVICES</a>
+    </nav>
+
+    <div class="top-bar-right">
+      <button class="sound-toggle" aria-label="Toggle ambient audio">
+        <svg class="sound-icon sound-on hidden" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
+            fill="currentColor" />
+        </svg>
+        <svg class="sound-icon sound-off" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"
+            fill="currentColor" />
+        </svg>
+      </button>
+
+      <a href="index.html#contact" class="cta-talk svc-cta-header">START YOUR PROJECT</a>
+
+      <button class="menu-toggle" aria-label="Open menu">
+        <span>MENU</span>
+        <div class="hamburger">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <main class="svc-main">
+
+    <!-- HERO -->
+    <section class="svc-hero" id="svc-hero">
+      <div class="svc-hero-inner">
+        <div class="svc-hero-content" data-reveal>
+          <p class="svc-eyebrow">AUROZE SERVICES</p>
+          <h1 class="svc-hero-title">
+            Services<br>
+            <span class="svc-hero-accent">Building Digital Products That Grow Businesses.</span>
+          </h1>
+          <p class="svc-hero-desc">
+            From strategy to launch, Auroze designs, develops and scales modern digital experiences for startups,
+            businesses and enterprises.
+          </p>
+          <div class="svc-hero-actions">
+            <a href="index.html#contact" class="cta-project svc-btn-magnetic" data-magnetic>
+              <span class="cta-text">START A PROJECT</span>
+              <span class="cta-arrow">→</span>
+              <span class="underline-line"></span>
+            </a>
+            <a href="#svc-grid" class="svc-btn-secondary svc-btn-magnetic" data-magnetic>
+              <span>Explore Services</span>
+              <span class="svc-btn-icon">↓</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="svc-hero-visual">
+          <div class="svc-hero-cycler" aria-live="polite">
+            <div class="svc-hero-cycler-stage">
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">Web Development</span></a>
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">Mobile Apps</span></a>
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">UI / UX</span></a>
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">AI</span></a>
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">Automation</span></a>
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">Marketing</span></a>
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">Branding</span></a>
+              <a href="#svc-grid" class="svc-hero-cycler-slide" data-cycler-slide><span class="svc-hero-cycler-name">POS</span></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES GRID -->
+    <section class="svc-grid-section" id="svc-grid">
+      <div class="svc-container">
+        <div class="svc-section-head" data-reveal>
+          <p class="svc-eyebrow">WHAT WE DO</p>
+          <h2 class="svc-section-title">Full-spectrum digital craft</h2>
+          <p class="svc-section-desc">Ten disciplines. One standard of excellence — engineered for growth.</p>
+        </div>
+        <div class="svc-grid" id="svc-grid-mount"></div>
+      </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section class="svc-process-section" id="svc-process">
+      <div class="svc-container">
+        <div class="svc-section-head" data-reveal>
+          <p class="svc-eyebrow">OUR PROCESS</p>
+          <h2 class="svc-section-title">From vision to velocity</h2>
+        </div>
+      </div>
+      <div class="svc-process-track-wrap">
+        <div class="svc-process-track" id="svc-process-mount"></div>
+      </div>
+    </section>
+
+    <!-- TECH STACK -->
+    <section class="svc-tech-section" id="svc-tech">
+      <div class="svc-container">
+        <div class="svc-section-head svc-section-head--center" data-reveal>
+          <p class="svc-eyebrow">TECH STACK</p>
+          <h2 class="svc-section-title">Tools we master</h2>
+        </div>
+      </div>
+      <div class="svc-marquee-wrap">
+        <div class="svc-marquee" id="svc-marquee-mount"></div>
+      </div>
+    </section>
+
+    <!-- WHY AUROZE -->
+    <section class="svc-why-section" id="svc-why">
+      <div class="svc-container">
+        <div class="svc-section-head" data-reveal>
+          <p class="svc-eyebrow">WHY CHOOSE AUROZE</p>
+          <h2 class="svc-section-title">Built different. Built to last.</h2>
+        </div>
+        <div class="svc-bento" id="svc-bento-mount"></div>
+      </div>
+    </section>
+
+    <!-- FEATURED WORK -->
+    <section class="svc-work-section" id="svc-work">
+      <div class="svc-container">
+        <div class="svc-section-head" data-reveal>
+          <p class="svc-eyebrow">FEATURED WORK</p>
+          <h2 class="svc-section-title">Selected projects</h2>
+          <p class="svc-section-desc">The same craft behind our home page showcase — built for real businesses.</p>
+        </div>
+        <div class="svc-work-grid" id="svc-work-mount"></div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="svc-testimonials-section" id="svc-testimonials">
+      <div class="svc-container">
+        <div class="svc-section-head" data-reveal>
+          <p class="svc-eyebrow">TESTIMONIALS</p>
+          <h2 class="svc-section-title">Client stories</h2>
+        </div>
+        <div class="svc-testimonials-slider">
+          <div class="svc-testimonials-track" id="svc-testimonials-mount"></div>
+          <div class="svc-testimonials-dots" id="svc-testimonials-dots"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="svc-faq-section" id="svc-faq">
+      <div class="svc-container svc-container--narrow">
+        <div class="svc-section-head svc-section-head--center" data-reveal>
+          <p class="svc-eyebrow">FAQ</p>
+          <h2 class="svc-section-title">Common questions</h2>
+        </div>
+        <div class="svc-faq-list" id="svc-faq-mount"></div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="svc-final-cta" id="svc-cta">
+      <canvas class="svc-cta-particles" aria-hidden="true"></canvas>
+      <div class="svc-cta-glow" aria-hidden="true"></div>
+      <div class="svc-container svc-cta-inner" data-reveal>
+        <h2 class="svc-cta-title">Let's Build Something Incredible Together</h2>
+        <p class="svc-cta-desc">Whether it's a startup idea, enterprise platform or digital transformation, Auroze is
+          ready to make it happen.</p>
+        <div class="svc-cta-actions">
+          <a href="mailto:hello@auroze.com" class="cta-project svc-btn-magnetic" data-magnetic>
+            <span class="cta-text">BOOK A CONSULTATION</span>
+            <span class="cta-arrow">→</span>
+            <span class="underline-line"></span>
+          </a>
+          <a href="index.html#contact" class="svc-btn-secondary svc-btn-magnetic" data-magnetic>
+            <span>Start Your Project</span>
+            <span class="svc-btn-icon">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-section" id="contact">
+    <div class="footer-smoke-overlay"></div>
+    <div class="footer-container">
+      <div class="footer-top-row">
+        <h2 class="footer-headline">Ready to build<br>something bold?</h2>
+        <a href="mailto:hello@auroze.com" class="cta-collab">
+          <span class="cta-text">START A COLLABORATION</span>
+          <span class="cta-arrow">→</span>
+          <span class="underline-line"></span>
+        </a>
+      </div>
+      <div class="footer-middle-row">
+        <div class="footer-left-col">
+          <div class="footer-copyright">©️AUROZE®️ 2026</div>
+          <div class="footer-instruction">SOUND ON ♪ HOVER THE LINES.</div>
+        </div>
+        <div class="footer-right-col">
+          <div class="footer-info-col">
+            <div class="info-label">BUSINESS ENQUIRY</div>
+            <div class="info-val"><span class="prefix">E.</span> hello@auroze.com</div>
+            <div class="info-val"><span class="prefix">P.</span> +91 98241 82099</div>
+          </div>
+          <div class="footer-info-col">
+            <div class="info-label">SOCIAL</div>
+            <div class="social-grid">
+              <a href="https://linkedin.com/company/auroze" target="_blank" rel="noopener noreferrer">Linkedin</a>
+              <a href="https://facebook.com/auroze" target="_blank" rel="noopener noreferrer">Facebook</a>
+              <a href="https://dribbble.com/auroze" target="_blank" rel="noopener noreferrer">Dribbble</a>
+              <a href="https://instagram.com/auroze" target="_blank" rel="noopener noreferrer">Instagram</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-wordmark-container">
+        <canvas id="footer-lines-canvas"></canvas>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner" id="cookie-banner">
+    <span class="cookie-text">WE USE COOKIES TO ENHANCE YOUR EXPERIENCE.</span>
+    <div class="cookie-actions">
+      <button class="cookie-btn btn-decline" id="cookie-decline">DECLINE</button>
+      <button class="cookie-btn btn-accept" id="cookie-accept">ACCEPT</button>
+    </div>
+  </div>
+
+  <div class="menu-overlay" id="menu-overlay">
+    <div class="overlay-background"></div>
+    <div class="overlay-header">
+      <a href="index.html" class="logo">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z"
+              fill="#d9d9d9" fill-rule="evenodd" />
+          </svg>
+        </div>
+        <span class="wordmark">AUROZE</span>
+      </a>
+      <button class="menu-close" id="menu-close" aria-label="Close menu">
+        <span>CLOSE</span>
+        <div class="close-icon">
+          <span class="cross cross-1"></span>
+          <span class="cross cross-2"></span>
+        </div>
+      </button>
+    </div>
+    <nav class="overlay-nav">
+      <ul>
+        <li><a href="index.html#work" class="nav-item" data-bg-img="work"><span class="nav-number">01</span> <span class="nav-label">WORK</span></a></li>
+        <li><a href="about.html" class="nav-item" data-bg-img="about"><span class="nav-number">02</span> <span class="nav-label">ABOUT</span></a></li>
+        <li><a href="services.html" class="nav-item is-active" data-bg-img="services"><span class="nav-number">03</span> <span class="nav-label">SERVICES</span></a></li>
+        <li><a href="index.html#contact" class="nav-item" data-bg-img="contact"><span class="nav-number">04</span> <span class="nav-label">CONTACT</span></a></li>
+      </ul>
+    </nav>
+    <div class="overlay-footer">
+      <div class="social-links">
+        <a href="#twitter" class="social-item">TWITTER</a>
+        <a href="#instagram" class="social-item">INSTAGRAM</a>
+        <a href="#linkedin" class="social-item">LINKEDIN</a>
+        <a href="#behance" class="social-item">BEHANCE</a>
+      </div>
+      <div class="office-location"><span>CREATIVE OUTPOST — NY / LON / BLR</span></div>
+    </div>
+  </div>
+
+  <script type="module" src="services.js"></script>
+</body>
+
+</html>
