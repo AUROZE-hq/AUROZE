@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   // 3. HEADLINE CYCLE WORD TRANSITION (MOTION BLUR)
   // ==========================================
-  const words = ['power', 'impact', 'innovation', 'clarity', 'scale', 'identity'];
+  const words = ['Success', 'impact', 'innovation', 'scale', 'momentum', 'growth'];
   let currentWordIdx = 0;
 
   const cycleWord = () => {
@@ -402,28 +402,22 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ==========================================
-  // 8. SCROLL EFFECTS: CENTERPIECE FADE & ABOUT WORD REVEAL
+  // 8. SCROLL EFFECTS: CENTERPIECE FADE
   // ==========================================
   const centerpieceLogo = document.querySelector('.centerpiece-logo-wrapper');
   const heroContent = document.querySelector('.hero-content');
   const aboutSection = document.querySelector('.about-section');
-  const scrollWords = document.querySelectorAll('.scroll-word');
-  const dividerContainer = document.querySelector('.about-divider-container');
-  const backdrop3D = document.querySelector('.about-backdrop');
 
   const handleScrollEffects = () => {
     const scrollY = window.scrollY;
     const viewHeight = window.innerHeight;
 
-    // Fade out centerpiece logo and hero text as we scroll down the hero screen
     if (centerpieceLogo || heroContent) {
-      // Fade completely by 50% scroll of viewport height
       const fadeProgress = Math.max(0, Math.min(1, scrollY / (viewHeight * 0.5)));
       const opacity = 1 - fadeProgress;
 
       if (centerpieceLogo) {
         centerpieceLogo.style.opacity = opacity;
-        // Avoid blocking clicks when faded out
         if (opacity <= 0.01) {
           centerpieceLogo.style.pointerEvents = 'none';
           centerpieceLogo.style.visibility = 'hidden';
@@ -437,71 +431,663 @@ document.addEventListener('DOMContentLoaded', () => {
         heroContent.style.opacity = opacity;
       }
     }
-
-    // Word reveal and divider expansion scroll animations inside the About section
-    if (aboutSection) {
-      const rect = aboutSection.getBoundingClientRect();
-      
-      // Calculate how far the About section is relative to viewport height
-      // 0.0 when top of section just reaches bottom of viewport
-      // 1.0 when top of section aligns with top of viewport
-      const scrollProgress = Math.max(0, Math.min(1, (viewHeight - rect.top) / viewHeight));
-
-      // 8a. Divider expansion trigger
-      if (dividerContainer) {
-        if (scrollProgress > 0.38) {
-          dividerContainer.classList.add('expanded');
-        } else {
-          dividerContainer.classList.remove('expanded');
-        }
-      }
-
-      // 8b. Progressive word focus reveal
-      if (scrollWords.length > 0) {
-        scrollWords.forEach((word, index) => {
-          // Distribute word reveals between 15% and 80% of section scroll progress
-          const wordStart = 0.15 + (index / scrollWords.length) * 0.55;
-          
-          if (scrollProgress > wordStart) {
-            word.classList.add('revealed');
-          } else {
-            word.classList.remove('revealed');
-          }
-        });
-      }
-    }
   };
 
-  // 9. 3D BACKDROP MOUSE PARALLAX
-  if (aboutSection && backdrop3D) {
-    const handleMouseParallax = (e) => {
-      const rect = aboutSection.getBoundingClientRect();
-      // Ensure element is visible in the viewport before calculation
-      if (rect.top < window.innerHeight && rect.bottom > 0) {
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        
-        // Gentle, high-end 3D rotation (max +/- 10 degrees)
-        const rotateX = -(y / (rect.height / 2)) * 10;
-        const rotateY = (x / (rect.width / 2)) * 10;
-        
-        backdrop3D.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  // 9. ABOUT SECTION — PREMIUM GSAP SCROLL ANIMATIONS
+  gsap.registerPlugin(ScrollTrigger);
+
+  const initSloganMagicHover = () => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const sloganLines = gsap.utils.toArray('.slogan-line');
+    if (!sloganLines.length) return;
+
+    const scramblePool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const canAnimate = !prefersReducedMotion && window.innerWidth > 768;
+
+    sloganLines.forEach((line) => {
+      const textEl = line.querySelector('.slogan-text');
+      if (!textEl) return;
+
+      const originalText = textEl.textContent.trim();
+      textEl.textContent = '';
+      const charSpans = [];
+
+      originalText.split('').forEach((char) => {
+        const span = document.createElement('span');
+        span.className = 'slogan-char';
+        span.textContent = char === ' ' ? '\u00A0' : char;
+        textEl.appendChild(span);
+        charSpans.push(span);
+      });
+
+      if (!canAnimate) return;
+
+      let scrambleTween = null;
+
+      const setScrambleChars = (originals) => {
+        charSpans.forEach((span, index) => {
+          if (!originals[index].trim()) return;
+          span.textContent = scramblePool[Math.floor(Math.random() * scramblePool.length)];
+        });
+      };
+
+      line.addEventListener('mouseenter', () => {
+        if (line.classList.contains('is-scrambling')) return;
+        if (scrambleTween) scrambleTween.kill();
+
+        const originals = charSpans.map((span) => span.textContent);
+        line.classList.add('is-scrambling');
+
+        scrambleTween = gsap.timeline({
+          onComplete: () => {
+            line.classList.remove('is-scrambling');
+            charSpans.forEach((span, index) => {
+              span.textContent = originals[index];
+            });
+            gsap.set(charSpans, { clearProps: 'transform,opacity' });
+          }
+        });
+
+        scrambleTween
+          .to(charSpans, {
+            duration: 0.2,
+            x: () => gsap.utils.random(-12, 12),
+            y: () => gsap.utils.random(-10, 8),
+            rotation: () => gsap.utils.random(-12, 12),
+            opacity: 0.48,
+            stagger: { each: 0.01, from: 'random' },
+            ease: 'sine.inOut',
+            onStart: () => setScrambleChars(originals)
+          })
+          .to(charSpans, {
+            duration: 0.16,
+            opacity: 0.62,
+            stagger: { each: 0.008, from: 'random' },
+            ease: 'sine.inOut',
+            onStart: () => setScrambleChars(originals)
+          }, '-=0.1')
+          .add('reassemble')
+          .call(() => {
+            charSpans.forEach((span, index) => {
+              span.textContent = originals[index];
+            });
+          }, null, 'reassemble')
+          .to(charSpans, {
+            duration: 0.6,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            opacity: 1,
+            stagger: { each: 0.014, from: 'random' },
+            ease: 'power3.out'
+          }, 'reassemble');
+      });
+    });
+  };
+
+  const initAboutAnimations = () => {
+    if (!aboutSection) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrollWords = gsap.utils.toArray('.scroll-word');
+    const sloganLines = gsap.utils.toArray('.slogan-line');
+    const aboutEyebrow = document.querySelector('.about-eyebrow');
+    const aboutGlow = document.querySelector('.about-glow-blob');
+    const aboutDecor = document.querySelector('.about-decorations');
+    const aboutDivider = document.querySelector('.about-divider');
+    const dividerPlus = document.querySelector('.divider-plus');
+    const missionParagraph = document.querySelector('.mission-paragraph');
+    const ctaAbout = document.querySelector('.cta-about-more');
+
+    const aboutBackdrop = document.querySelector('.about-backdrop');
+    const aboutVideoBg = document.querySelector('.about-video-bg');
+    const aboutBgVideo = document.querySelector('.about-bg-video');
+    const aboutRail = document.querySelector('.about-statement-rail');
+    const aboutBreak = document.querySelector('.about-statement-break');
+    const aboutInfoPanel = document.querySelector('.about-info-panel');
+    const aboutPanelReveals = gsap.utils.toArray('.about-panel-reveal');
+    const leadLines = gsap.utils.toArray('.statement-line.is-lead');
+    const bodyLines = gsap.utils.toArray('.statement-line.is-body');
+    const isMobile = window.innerWidth <= 768;
+    const mobileDividerWidth = 'calc(100% - 24px)';
+
+    if (prefersReducedMotion) {
+      gsap.set([aboutEyebrow, aboutGlow, aboutDecor, ...scrollWords, ...sloganLines, missionParagraph, ctaAbout, ...aboutPanelReveals], {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        scale: 1
+      });
+      if (aboutInfoPanel) gsap.set(aboutInfoPanel, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' });
+      if (aboutRail) gsap.set(aboutRail, { scaleY: 1, opacity: 1 });
+      if (aboutBreak) gsap.set(aboutBreak, { scaleX: 1, opacity: 1 });
+      if (aboutDivider) gsap.set(aboutDivider, { width: isMobile ? mobileDividerWidth : 'calc(100% - 80px)' });
+      if (dividerPlus) gsap.set(dividerPlus, { scale: 1 });
+      if (aboutBackdrop && isMobile) gsap.set(aboutBackdrop, { display: 'none' });
+      if (aboutDecor && isMobile) gsap.set(aboutDecor, { display: 'none' });
+      if (aboutVideoBg) gsap.set(aboutVideoBg, { opacity: isMobile ? 0 : 1, display: isMobile ? 'none' : 'block' });
+      return;
+    }
+
+    if (aboutVideoBg) {
+      if (isMobile) {
+        gsap.set(aboutVideoBg, { display: 'none', opacity: 0 });
+        if (aboutBgVideo) aboutBgVideo.pause();
+      } else {
+        gsap.set(aboutVideoBg, { display: 'block', opacity: 1 });
+      }
+    }
+    if (aboutBackdrop && isMobile) gsap.set(aboutBackdrop, { display: 'none' });
+    if (aboutDecor && isMobile) gsap.set(aboutDecor, { display: 'none' });
+    if (aboutInfoPanel) {
+      gsap.set(aboutInfoPanel, isMobile
+        ? { opacity: 0, y: 28, scale: 0.96, filter: 'blur(8px)' }
+        : { opacity: 0, y: 24, scale: 0.97, force3D: true });
+    }
+    if (aboutRail && !isMobile) gsap.set(aboutRail, { scaleY: 0, opacity: 0, transformOrigin: 'top center' });
+    if (aboutBreak && !isMobile) gsap.set(aboutBreak, { scaleX: 0, opacity: 0, transformOrigin: 'left center' });
+
+    // Everything hidden on enter
+    gsap.set(aboutEyebrow, { opacity: 0, y: isMobile ? -8 : -12 });
+    if (!isMobile) gsap.set(aboutGlow, { opacity: 0, scale: 1 });
+    if (!isMobile) gsap.set(aboutDecor, { opacity: 0 });
+    gsap.set(scrollWords, isMobile
+      ? { opacity: 0, y: 12, filter: 'blur(4px)', scale: 0.99 }
+      : { opacity: 0, y: 24, scale: 0.97, force3D: true });
+    gsap.set(sloganLines, isMobile
+      ? { opacity: 0, y: 10 }
+      : { opacity: 0, y: 24, force3D: true });
+    gsap.set(missionParagraph, isMobile
+      ? { opacity: 0, y: 10 }
+      : { opacity: 0, y: 24, force3D: true });
+    gsap.set(ctaAbout, isMobile ? { opacity: 0, y: 10 } : { opacity: 0, y: 24 });
+    gsap.set(aboutPanelReveals, { opacity: 0, y: 20 });
+    if (aboutDivider) gsap.set(aboutDivider, { width: 0 });
+    if (dividerPlus) gsap.set(dividerPlus, { scale: 0, y: isMobile ? 0 : -1 });
+
+    const lockAboutEnterState = () => {
+      if (aboutVideoBg) {
+        if (isMobile) {
+          gsap.set(aboutVideoBg, { display: 'none', opacity: 0 });
+          if (aboutBgVideo) aboutBgVideo.pause();
+        } else {
+          gsap.set(aboutVideoBg, { display: 'block', opacity: 1 });
+        }
+      }
+      if (aboutBackdrop && isMobile) gsap.set(aboutBackdrop, { display: 'none' });
+      if (aboutDecor && isMobile) gsap.set(aboutDecor, { display: 'none' });
+      gsap.set(aboutEyebrow, { opacity: 0, y: isMobile ? -8 : -12 });
+      if (aboutRail && !isMobile) gsap.set(aboutRail, { scaleY: 0, opacity: 0 });
+      if (aboutBreak && !isMobile) gsap.set(aboutBreak, { scaleX: 0, opacity: 0 });
+      gsap.set(scrollWords, isMobile
+        ? { opacity: 0, y: 12, filter: 'blur(4px)', scale: 0.99 }
+        : { opacity: 0, y: 24, scale: 0.97, force3D: true });
+      if (aboutInfoPanel) {
+        gsap.set(aboutInfoPanel, isMobile
+          ? { opacity: 0, y: 28, scale: 0.96, filter: 'blur(8px)' }
+          : { opacity: 0, y: 24, scale: 0.97, force3D: true });
+      }
+      gsap.set(aboutPanelReveals, { opacity: 0, y: 20 });
+      if (aboutDivider) gsap.set(aboutDivider, { width: 0 });
+      if (dividerPlus) gsap.set(dividerPlus, { scale: 0, y: isMobile ? 0 : -1 });
+      gsap.set(sloganLines, isMobile ? { opacity: 0, y: 10 } : { opacity: 0, y: 24, force3D: true });
+      gsap.set(missionParagraph, isMobile ? { opacity: 0, y: 10 } : { opacity: 0, y: 24, force3D: true });
+      gsap.set(ctaAbout, isMobile ? { opacity: 0, y: 10 } : { opacity: 0, y: 24 });
+      if (!isMobile) gsap.set(aboutGlow, { opacity: 0 });
+    };
+
+    const lockAboutExitState = () => {
+      gsap.set(aboutEyebrow, { opacity: 0, y: isMobile ? -8 : -12 });
+      if (aboutRail && !isMobile) gsap.set(aboutRail, { scaleY: 0, opacity: 0 });
+      if (aboutBreak && !isMobile) gsap.set(aboutBreak, { scaleX: 0, opacity: 0 });
+      gsap.set(scrollWords, isMobile
+        ? { opacity: 0, y: -10, filter: 'blur(4px)', scale: 0.99 }
+        : { opacity: 0, y: -18, scale: 0.97, force3D: true });
+      if (aboutInfoPanel) {
+        gsap.set(aboutInfoPanel, isMobile
+          ? { opacity: 0, y: -24, scale: 0.97, filter: 'blur(8px)' }
+          : { opacity: 0, y: -20, scale: 0.98, force3D: true });
+      }
+      gsap.set(aboutPanelReveals, { opacity: 0, y: -16 });
+      if (aboutDivider) gsap.set(aboutDivider, { width: 0 });
+      if (dividerPlus) gsap.set(dividerPlus, { scale: 0, opacity: 0 });
+      gsap.set(sloganLines, isMobile ? { opacity: 0, y: 8 } : { opacity: 0, y: 20, force3D: true });
+      gsap.set(missionParagraph, isMobile ? { opacity: 0, y: 8 } : { opacity: 0, y: 20, force3D: true });
+      gsap.set(ctaAbout, isMobile ? { opacity: 0, y: 8 } : { opacity: 0, y: 24 });
+      if (!isMobile) gsap.set(aboutGlow, { opacity: 0 });
+      if (aboutBackdrop && isMobile) gsap.set(aboutBackdrop, { display: 'none' });
+      if (aboutDecor && isMobile) gsap.set(aboutDecor, { display: 'none' });
+      if (aboutVideoBg && !isMobile) gsap.set(aboutVideoBg, { opacity: 1 });
+    };
+
+    const scrollLength = isMobile ? '+=300%' : '+=340%';
+    const scrubAmount = isMobile ? 0.52 : 1.35;
+    const revealAt = isMobile
+      ? { divider: 1.12, slogans: 1.34, mission: 1.52, cta: 1.68, hold: 2.1, end: 3.5 }
+      : { video: 0, slogans: 1.72, mission: 2.0, cta: 2.22, hold: 2.6, end: 4.2 };
+    const exitAt = isMobile
+      ? { bottom: 2.28, divider: 2.62, words: 2.78, eyebrow: 2.95, end: 3.5 }
+      : { bottom: 2.98, body: 3.38, brk: 3.72, lead: 3.76, rail: 4.02, eyebrow: 4.06, glow: 4.02, end: 4.2 };
+
+    if (!isMobile) {
+      gsap.ticker.lagSmoothing(500, 33);
+    }
+
+    const playAboutVideo = () => {
+      if (!aboutBgVideo || isMobile) return;
+      aboutBgVideo.muted = true;
+      aboutBgVideo.defaultMuted = true;
+      const playPromise = aboutBgVideo.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
       }
     };
 
-    const resetMouseParallax = () => {
-      backdrop3D.style.transform = `rotateX(0deg) rotateY(0deg)`;
+    const pinAboutVideoBg = () => {
+      if (isMobile || !aboutVideoBg || !aboutSection) return;
+      if (aboutVideoBg.parentElement !== document.body) {
+        document.body.appendChild(aboutVideoBg);
+      }
+      aboutVideoBg.classList.add('is-viewport-fixed');
+      gsap.set(aboutVideoBg, { opacity: 1, display: 'block', clearProps: 'transform,x,y,scale' });
+      if (aboutBgVideo) gsap.set(aboutBgVideo, { clearProps: 'transform,x,y,scale' });
+      playAboutVideo();
     };
 
-    aboutSection.addEventListener('mousemove', handleMouseParallax, { passive: true });
-    aboutSection.addEventListener('mouseleave', resetMouseParallax, { passive: true });
-  }
+    const unpinAboutVideoBg = () => {
+      if (isMobile || !aboutVideoBg || !aboutSection) return;
+      aboutVideoBg.classList.remove('is-viewport-fixed');
+      if (aboutVideoBg.parentElement !== aboutSection) {
+        aboutSection.insertBefore(aboutVideoBg, aboutSection.firstChild);
+      }
+      gsap.set(aboutVideoBg, { opacity: 1, display: 'block' });
+    };
+
+    if (!isMobile) {
+      playAboutVideo();
+    }
+
+    const aboutTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: aboutSection,
+        start: 'top top',
+        end: scrollLength,
+        pin: true,
+        pinType: 'fixed',
+        scrub: scrubAmount,
+        anticipatePin: 0,
+        fastScrollEnd: true,
+        invalidateOnRefresh: true,
+        onEnter: () => {
+          if (!isMobile) {
+            aboutSection.classList.add('is-about-active');
+            pinAboutVideoBg();
+          }
+          playAboutVideo();
+        },
+        onEnterBack: () => {
+          if (!isMobile) {
+            aboutSection.classList.add('is-about-active');
+            pinAboutVideoBg();
+          }
+          playAboutVideo();
+        },
+        onLeave: () => {
+          if (!isMobile) {
+            aboutSection.classList.remove('is-about-active');
+            unpinAboutVideoBg();
+          }
+          if (isMobile) lockAboutExitState();
+        },
+        onLeaveBack: () => {
+          if (!isMobile) {
+            aboutSection.classList.remove('is-about-active');
+            unpinAboutVideoBg();
+          }
+          if (isMobile) lockAboutEnterState();
+        }
+      }
+    });
+
+    if (!isMobile && aboutTl.scrollTrigger?.isActive) {
+      aboutSection.classList.add('is-about-active');
+      pinAboutVideoBg();
+    }
+
+    // Phase 0 — settle
+    aboutTl.to({}, { duration: isMobile ? 0.16 : 0.34 }, 0);
+
+    // Phase 1 — eyebrow + headline
+    aboutTl
+      .to(aboutEyebrow, { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out' }, isMobile ? 0.24 : 0.36);
+
+    if (aboutRail && !isMobile) {
+      aboutTl.to(aboutRail, { scaleY: 1, opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.42);
+    }
+
+    if (isMobile) {
+      aboutTl.to(scrollWords, {
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        scale: 1,
+        duration: 0.5,
+        stagger: 0.018,
+        ease: 'power3.out'
+      }, 0.28);
+    } else {
+      leadLines.forEach((line, index) => {
+        const words = line.querySelectorAll('.scroll-word');
+        aboutTl.to(words, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.85,
+          stagger: 0.06,
+          ease: 'power3.out',
+          force3D: true
+        }, 0.48 + index * 0.16);
+      });
+    }
+
+    if (aboutBreak && !isMobile) {
+      aboutTl.to(aboutBreak, { scaleX: 1, opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.82);
+    }
+
+    if (!isMobile) {
+      bodyLines.forEach((line, index) => {
+        const words = line.querySelectorAll('.scroll-word');
+        aboutTl.to(words, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.8,
+          stagger: 0.05,
+          ease: 'power3.out',
+          force3D: true
+        }, 0.9 + index * 0.13);
+      });
+    }
+
+    // Mobile — divider after headline
+    if (isMobile && aboutDivider) {
+      aboutTl.to(aboutDivider, {
+        width: mobileDividerWidth,
+        duration: 0.65,
+        ease: 'power2.inOut'
+      }, revealAt.divider);
+    }
+
+    if (isMobile && dividerPlus) {
+      aboutTl.to(dividerPlus, {
+        scale: 1,
+        y: 0,
+        duration: 0.4,
+        ease: 'back.out(1.6)'
+      }, revealAt.divider + 0.18);
+    }
+
+    // Phase 2 — right info panel (desktop only)
+    if (!isMobile && aboutInfoPanel) {
+      aboutTl.to(aboutInfoPanel, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: 'power3.out',
+        force3D: true
+      }, 0.98);
+    }
+
+    if (!isMobile && aboutPanelReveals.length) {
+      aboutTl.to(aboutPanelReveals, {
+        opacity: 1,
+        y: 0,
+        duration: 0.55,
+        stagger: 0.09,
+        ease: 'power3.out'
+      }, 1.1);
+    }
+
+    // Phase 3 — divider (desktop only)
+    if (!isMobile && aboutDivider) {
+      aboutTl.to(aboutDivider, {
+        width: 'calc(100% - 80px)',
+        duration: 0.75,
+        ease: 'power2.inOut'
+      }, 1.58);
+    }
+
+    if (!isMobile && dividerPlus) {
+      aboutTl.to(dividerPlus, {
+        scale: 1,
+        y: -1,
+        duration: 0.5,
+        ease: 'back.out(1.6)'
+      }, 1.88);
+    }
+
+    // Phase 4 — bottom content
+    if (isMobile) {
+      aboutTl
+        .to(sloganLines, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: 'power3.out'
+        }, revealAt.slogans)
+        .to(missionParagraph, {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          ease: 'power3.out'
+        }, revealAt.mission)
+        .to(ctaAbout, {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          ease: 'power3.out'
+        }, revealAt.cta);
+    } else {
+      aboutTl
+        .to(sloganLines, {
+          opacity: 1,
+          y: 0,
+          duration: 0.75,
+          stagger: 0.12,
+          ease: 'power3.out',
+          force3D: true
+        }, revealAt.slogans)
+        .to(missionParagraph, {
+          opacity: 1,
+          y: 0,
+          duration: 0.85,
+          ease: 'power3.out',
+          force3D: true
+        }, revealAt.mission)
+        .to(ctaAbout, {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          ease: 'power3.out'
+        }, revealAt.cta);
+    }
+
+    // Glow blob skipped on desktop — large blur filter causes scroll jank
+
+    // Phase 5 — hold full layout
+    aboutTl.to({}, { duration: 0.35 }, revealAt.hold);
+
+    // Phase 6 — exit: mirror reveal order
+    if (isMobile) {
+      aboutTl
+        .to(sloganLines, {
+          opacity: 0,
+          y: 8,
+          duration: 0.4,
+          stagger: 0.04,
+          ease: 'power2.in'
+        }, exitAt.bottom)
+        .to(missionParagraph, {
+          opacity: 0,
+          y: 8,
+          duration: 0.38,
+          ease: 'power2.in'
+        }, exitAt.bottom + 0.07)
+        .to(ctaAbout, {
+          opacity: 0,
+          y: 8,
+          duration: 0.35,
+          ease: 'power2.in'
+        }, exitAt.bottom + 0.12);
+    } else {
+      aboutTl
+        .to(sloganLines, {
+          opacity: 0,
+          y: 28,
+          duration: 0.55,
+          stagger: 0.07,
+          ease: 'power2.in',
+          force3D: true
+        }, exitAt.bottom)
+        .to(missionParagraph, {
+          opacity: 0,
+          y: 28,
+          duration: 0.5,
+          ease: 'power2.in',
+          force3D: true
+        }, exitAt.bottom + 0.1)
+        .to(ctaAbout, {
+          opacity: 0,
+          y: 24,
+          duration: 0.45,
+          ease: 'power2.in'
+        }, exitAt.bottom + 0.16);
+    }
+
+    if (isMobile && dividerPlus) {
+      aboutTl.to(dividerPlus, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.38,
+        ease: 'power2.in'
+      }, exitAt.divider);
+    }
+
+    if (isMobile && aboutDivider) {
+      aboutTl.to(aboutDivider, {
+        width: 0,
+        duration: 0.55,
+        ease: 'power2.in'
+      }, exitAt.divider + 0.06);
+    }
+
+    if (!isMobile && dividerPlus) {
+      aboutTl.to(dividerPlus, {
+        scale: 0,
+        opacity: 0,
+        duration: 0.4,
+        ease: 'power2.in'
+      }, exitAt.bottom + 0.2);
+    }
+
+    if (!isMobile && aboutDivider) {
+      aboutTl.to(aboutDivider, {
+        width: 0,
+        duration: 0.6,
+        ease: 'power2.in'
+      }, exitAt.bottom + 0.22);
+    }
+
+    if (!isMobile && aboutPanelReveals.length) {
+      aboutTl.to(aboutPanelReveals, {
+        opacity: 0,
+        y: -18,
+        duration: 0.45,
+        stagger: 0.06,
+        ease: 'power2.in'
+      }, exitAt.bottom + 0.3);
+    }
+
+    if (!isMobile && aboutInfoPanel) {
+      aboutTl.to(aboutInfoPanel, {
+        opacity: 0,
+        y: -24,
+        scale: 0.97,
+        duration: 0.65,
+        ease: 'power2.in',
+        force3D: true
+      }, exitAt.bottom + 0.34);
+    }
+
+    if (isMobile) {
+      aboutTl.to(scrollWords, {
+        opacity: 0,
+        y: -10,
+        filter: 'blur(4px)',
+        scale: 0.99,
+        duration: 0.38,
+        stagger: 0.012,
+        ease: 'power2.in'
+      }, exitAt.words);
+    } else {
+      [...bodyLines].reverse().forEach((line, index) => {
+        const words = line.querySelectorAll('.scroll-word');
+        aboutTl.to(words, {
+          opacity: 0,
+          y: -22,
+          scale: 0.96,
+          duration: 0.45,
+          stagger: 0.04,
+          ease: 'power2.in',
+          force3D: true
+        }, exitAt.body + index * 0.1);
+      });
+    }
+
+    if (aboutBreak && !isMobile) {
+      aboutTl.to(aboutBreak, { scaleX: 0, opacity: 0, duration: 0.35, ease: 'power2.in' }, exitAt.brk);
+    }
+
+    if (!isMobile) {
+      [...leadLines].reverse().forEach((line, index) => {
+        const words = line.querySelectorAll('.scroll-word');
+        aboutTl.to(words, {
+          opacity: 0,
+          y: -22,
+          scale: 0.96,
+          duration: 0.45,
+          stagger: 0.04,
+          ease: 'power2.in',
+          force3D: true
+        }, exitAt.lead + index * 0.12);
+      });
+    }
+
+    if (aboutRail && !isMobile) {
+      aboutTl.to(aboutRail, { scaleY: 0, opacity: 0, duration: 0.45, ease: 'power2.in' }, exitAt.rail);
+    }
+
+    aboutTl
+      .to(aboutEyebrow, {
+        opacity: 0,
+        y: isMobile ? -8 : -12,
+        duration: 0.38,
+        ease: 'power2.in'
+      }, exitAt.eyebrow);
+
+    // Video mouse parallax disabled — scaling during pin caused repaint jank
+
+    aboutTl.to({}, { duration: 0.3 }, revealAt.end);
+  };
+
+  initAboutAnimations();
+  initSloganMagicHover();
 
   // ==========================================
   // 10. KEY FACTS PINNED DECK SCROLL ANIMATION
   // ==========================================
-  // Register ScrollTrigger with GSAP
-  gsap.registerPlugin(ScrollTrigger);
 
   const factsSection = document.querySelector('.key-facts-section');
   const cards = gsap.utils.toArray('.key-fact-card');
@@ -522,12 +1108,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create GSAP ScrollTrigger timeline to pin and animate cards
     const tl = gsap.timeline({
+      smoothChildTiming: true,
       scrollTrigger: {
         trigger: '.key-facts-section',
         start: 'top top',
-        end: '+=400%', // 4 viewports scroll duration (1 per card advance)
+        end: '+=400%',
         pin: true,
         scrub: 1.2,
+        fastScrollEnd: true,
+        anticipatePin: 0,
         invalidateOnRefresh: true
       }
     });
