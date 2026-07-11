@@ -1,8 +1,20 @@
 import { init3DScene } from './scene3d.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the 3D WebGL Monolith Scene
+  // Initialize the 3D WebGL Monolith Scene in the background
   init3DScene();
+
+  // Check for intro skip criteria (prefers-reduced-motion accessibility)
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const introOverlay = document.getElementById('cinematic-intro');
+
+  if (reducedMotion) {
+    if (introOverlay) {
+      introOverlay.remove();
+    }
+  } else {
+    playCinematicIntro(introOverlay);
+  }
 
   // ==========================================
   // CENTERPIECE LOGO WOOFER EFFECT
@@ -39,7 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const ease = 0.08; // smooth liquid easing
     const opacities = [0.6, 0.4, 0.25, 0.12, 0.05];
 
+    let hoverTimeout = null;
+    let isBroken = false;
+    let isReassembling = false;
+
     function updateLerpRotation() {
+      if (isBroken || isReassembling) {
+        animFrameId = requestAnimationFrame(updateLerpRotation);
+        return;
+      }
+
       if (isHovered) {
         currentProgress += (targetProgress - currentProgress) * ease;
       } else {
@@ -103,6 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
       targetProgress = Math.max(-1, Math.min(1, progress));
       isHovered = true;
 
+      // Start the 3-second shatter countdown if not already set or broken
+      if (!hoverTimeout && !isBroken && !isReassembling) {
+        hoverTimeout = setTimeout(() => {
+          shatterCenterpieceLogo();
+        }, 3000);
+      }
+
       if (!animFrameId) {
         animFrameId = requestAnimationFrame(updateLerpRotation);
       }
@@ -121,7 +149,229 @@ document.addEventListener('DOMContentLoaded', () => {
     cpWrapper.addEventListener('mouseleave', () => {
       isHovered = false;
       cpLogo.classList.remove('trail-left', 'trail-right');
+
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+
+      if (isBroken) {
+        reassembleCenterpieceLogo();
+      }
     });
+
+    // Shatters both the logo and the wordmark text into matching color shards
+    function shatterCenterpieceLogo() {
+      isBroken = true;
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+
+      // Hide original centerpiece logo wrapper (.logo-main), all trail outline layers, and wordmark text
+      const logoMain = cpLogo.querySelector('.logo-main');
+      const trails = cpLogo.querySelectorAll('.logo-trail');
+      const wordmark = cpLogo.querySelector('.centerpiece-wordmark');
+
+      gsap.to(logoMain, { opacity: 0, duration: 0.1, overwrite: 'auto' });
+      trails.forEach(trail => {
+        gsap.to(trail, { opacity: 0, duration: 0.1, overwrite: 'auto' });
+      });
+      gsap.to(wordmark, { opacity: 0, duration: 0.1, overwrite: 'auto' });
+
+      // Create overlay container for the animated shatter elements
+      let shatterContainer = cpLogo.querySelector('.shatter-overlay-container');
+      if (shatterContainer) shatterContainer.remove();
+      shatterContainer = document.createElement('div');
+      shatterContainer.className = 'shatter-overlay-container';
+      shatterContainer.style.position = 'absolute';
+      shatterContainer.style.inset = '0';
+      shatterContainer.style.pointerEvents = 'none';
+      shatterContainer.style.overflow = 'visible';
+      cpLogo.appendChild(shatterContainer);
+
+      // 1. Create SVG for the 4 exploding logo segments
+      const overlaySvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      overlaySvg.setAttribute('viewBox', '200 150 630 560');
+      overlaySvg.style.position = 'absolute';
+      overlaySvg.style.inset = '0';
+      overlaySvg.style.pointerEvents = 'none';
+      overlaySvg.style.overflow = 'visible';
+      shatterContainer.appendChild(overlaySvg);
+
+      // Copy defs (gradients) from centerpiece SVG
+      const cpDefs = cpLogo.querySelector('defs');
+      if (cpDefs) {
+        const clonedDefs = cpDefs.cloneNode(true);
+        overlaySvg.appendChild(clonedDefs);
+      }
+
+      const paths = [
+        { d: "M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z", angle: -Math.PI * 0.7 },
+        { d: "M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z", angle: -Math.PI * 0.3 },
+        { d: "M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z", angle: Math.PI * 0.3 },
+        { d: "M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z", angle: Math.PI * 0.7 }
+      ];
+
+      paths.forEach((pData) => {
+        const pathEl = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        pathEl.setAttribute('d', pData.d);
+        pathEl.setAttribute('fill', 'url(#silver-grad-cp)');
+        overlaySvg.appendChild(pathEl);
+
+        const force = 1.8 + Math.random() * 1.5;
+        const destX = Math.cos(pData.angle) * 350 * force;
+        const destY = Math.sin(pData.angle) * 280 * force + 280; // gravity drop downwards
+        const rot = (Math.random() - 0.5) * 540;
+
+        gsap.to(pathEl, {
+          x: destX,
+          y: destY,
+          rotation: rot,
+          scale: 0.2,
+          opacity: 0,
+          duration: 1.4 + Math.random() * 0.3,
+          ease: 'power2.out'
+        });
+      });
+
+      // 2. Create individual exploding letters for the wordmark
+      const textContainer = document.createElement('div');
+      textContainer.style.position = 'absolute';
+      textContainer.style.bottom = '-55px';
+      textContainer.style.left = '50%';
+      textContainer.style.transform = 'translateX(-50%) translateZ(15px)';
+      textContainer.style.fontFamily = 'var(--font-display)';
+      textContainer.style.fontWeight = '700';
+      textContainer.style.fontSize = '40px';
+      textContainer.style.letterSpacing = '5px';
+      textContainer.style.color = 'var(--text-white)';
+      textContainer.style.whiteSpace = 'nowrap';
+      textContainer.style.pointerEvents = 'none';
+      shatterContainer.appendChild(textContainer);
+
+      const letters = ['A', 'U', 'R', 'O', 'Z', 'E'];
+      const letterSpans = [];
+      letters.forEach(char => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.style.display = 'inline-block';
+        span.style.willChange = 'transform, opacity';
+        textContainer.appendChild(span);
+        letterSpans.push(span);
+      });
+
+      const regSpan = document.createElement('span');
+      regSpan.textContent = '®';
+      regSpan.style.display = 'inline-block';
+      regSpan.style.fontSize = '18px';
+      regSpan.style.verticalAlign = 'super';
+      regSpan.style.marginLeft = '2px';
+      regSpan.style.willChange = 'transform, opacity';
+      textContainer.appendChild(regSpan);
+      letterSpans.push(regSpan);
+
+      letterSpans.forEach((span, idx) => {
+        const letterAngle = (idx < 3) ? Math.PI + (idx - 1.5) * 0.4 : (idx - 3.5) * 0.4;
+        const force = 1.6 + Math.random() * 1.5;
+        const destX = Math.cos(letterAngle) * 260 * force;
+        const destY = Math.sin(letterAngle) * 150 * force + 240; // gravity drop downwards
+        const rot = (Math.random() - 0.5) * 540;
+
+        gsap.to(span, {
+          x: destX,
+          y: destY,
+          rotation: rot,
+          opacity: 0,
+          scale: 0.15,
+          duration: 1.3 + Math.random() * 0.3,
+          ease: 'power2.out'
+        });
+      });
+
+      // 3. Generate 30 tiny glass shards to add glass physics texture
+      const numGlassShards = 30;
+      for (let i = 0; i < numGlassShards; i++) {
+        const shard = document.createElement('div');
+        const size = 6 + Math.random() * 14;
+        const a = Math.random() * Math.PI * 2;
+        const r = Math.random() * 150;
+        const left = 210 + Math.cos(a) * r - (size / 2);
+        const top = 210 + Math.sin(a) * r - (size / 2);
+
+        shard.style.position = 'absolute';
+        shard.style.width = `${size}px`;
+        shard.style.height = `${size}px`;
+        shard.style.left = `${left}px`;
+        shard.style.top = `${top}px`;
+        shard.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(200,200,200,0.3) 100%)';
+        shard.style.border = '1px solid rgba(255,255,255,0.5)';
+
+        const p1x = Math.floor(Math.random() * 40);
+        const p1y = Math.floor(Math.random() * 40);
+        const p2x = Math.floor(60 + Math.random() * 40);
+        const p2y = Math.floor(Math.random() * 40);
+        const p3x = Math.floor(50 + Math.random() * 50);
+        const p3y = Math.floor(60 + Math.random() * 40);
+        shard.style.clipPath = `polygon(${p1x}% ${p1y}%, ${p2x}% ${p2y}%, ${p3x}% ${p3y}%)`;
+        shatterContainer.appendChild(shard);
+
+        const dx = left - 210;
+        const dy = top - 210;
+        const shardAngle = Math.atan2(dy, dx);
+        const force = 2.0 + Math.random() * 2.5;
+
+        gsap.to(shard, {
+          x: Math.cos(shardAngle) * 360 * force,
+          y: Math.sin(shardAngle) * 360 * force + 300,
+          rotation: (Math.random() - 0.5) * 1080,
+          opacity: 0,
+          scale: 0.1,
+          duration: 1.2 + Math.random() * 0.4,
+          ease: 'power2.out',
+          onComplete: () => { shard.remove(); }
+        });
+      }
+    }
+
+    // Reassembles centerpiece back to default
+    function reassembleCenterpieceLogo() {
+      isBroken = false;
+      isReassembling = true;
+
+      // Clean up the animated shatter elements
+      const shatterContainer = cpLogo.querySelector('.shatter-overlay-container');
+      if (shatterContainer) {
+        gsap.to(shatterContainer, {
+          opacity: 0,
+          duration: 0.4,
+          onComplete: () => { shatterContainer.remove(); }
+        });
+      }
+
+      // Fade centerpiece logo segments and wordmark text back in
+      const logoMain = cpLogo.querySelector('.logo-main');
+      const wordmark = cpLogo.querySelector('.centerpiece-wordmark');
+
+      gsap.to(logoMain, {
+        opacity: 1,
+        duration: 1.2,
+        ease: 'power3.out',
+        overwrite: 'auto',
+        onComplete: () => {
+          isReassembling = false;
+        }
+      });
+
+      gsap.to(wordmark, {
+        opacity: 1,
+        y: 0,
+        rotation: 0,
+        duration: 1.2,
+        ease: 'power3.out',
+        overwrite: 'auto'
+      });
+    }
   }
 
   // Core UI Elements
@@ -189,21 +439,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const cycleWord = () => {
     // 1. Trigger blur out
     morphingWord.classList.add('blur-out');
-    
+
     // 2. Wait for blur out transition to finish (400ms)
     setTimeout(() => {
       // Shift word index
       currentWordIdx = (currentWordIdx + 1) % words.length;
-      
+
       // Update text
       morphingWord.textContent = words[currentWordIdx];
-      
+
       // Instantly position it below (blur-in state)
       morphingWord.className = 'word-morph blur-in';
-      
+
       // Force repaint to make sure instant transition is registered
       morphingWord.offsetWidth;
-      
+
       // 3. Remove blur-in to animate upward & clear blur
       morphingWord.className = 'word-morph';
     }, 400);
@@ -268,7 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     stars.forEach(star => {
       star.phase += star.speed;
       const opacity = (Math.sin(star.phase) + 1) / 2 * 0.35 + 0.05; // faint ambient glow (5-40% opacity)
-      
+
       // Calculate absolute positions with subtle parallax shifts
       const x = ((star.x / 100) * width) + (mouseX * 25);
       const y = ((star.y / 100) * height) + (mouseY * 25);
@@ -321,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const initAudio = () => {
     // Create Audio Context
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
+
     // Create Nodes
     mainGainNode = audioCtx.createGain();
     mainGainNode.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -366,7 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     subGain.connect(filter);
     midGain.connect(filter);
-    
+
     filter.connect(mainGainNode);
     mainGainNode.connect(audioCtx.destination);
 
@@ -391,7 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mainGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
       mainGainNode.gain.setValueAtTime(mainGainNode.gain.value, audioCtx.currentTime);
       mainGainNode.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1.5); // soft rumble level
-      
+
       soundOnIcon.classList.remove('hidden');
       soundOffIcon.classList.add('hidden');
       soundToggleBtn.style.borderColor = 'var(--accent-orange)';
@@ -401,7 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mainGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
       mainGainNode.gain.setValueAtTime(mainGainNode.gain.value, audioCtx.currentTime);
       mainGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.2);
-      
+
       soundOnIcon.classList.add('hidden');
       soundOffIcon.classList.remove('hidden');
       soundToggleBtn.style.borderColor = 'rgba(255, 255, 255, 0.08)';
@@ -416,7 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   window.addEventListener('auroze-proximity', (e) => {
     if (!audioCtx || audioCtx.state === 'suspended' || !soundEnabled) return;
-    
+
     const hovering = e.detail.hovering;
     const now = audioCtx.currentTime;
 
@@ -482,7 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const updateLogoSparks = () => {
     sparksCtx.clearRect(0, 0, 100, 100);
-    
+
     for (let i = logoSparks.length - 1; i >= 0; i--) {
       const spark = logoSparks[i];
       spark.x += spark.vx;
@@ -509,7 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rect = sparksCanvas.getBoundingClientRect();
     const mX = ((e.clientX - rect.left) / rect.width) * 100;
     const mY = ((e.clientY - rect.top) / rect.height) * 100;
-    
+
     for (let i = 0; i < 2; i++) {
       addLogoSpark(mX, mY);
     }
@@ -799,7 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
       aboutBgVideo.defaultMuted = true;
       const playPromise = aboutBgVideo.play();
       if (playPromise && typeof playPromise.catch === 'function') {
-        playPromise.catch(() => {});
+        playPromise.catch(() => { });
       }
     };
 
@@ -1797,8 +2047,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Masonry Dribbble cards scroll parallax translations
   const explorationsCollage = document.querySelector('.explorations-collage');
   if (explorationsCollage) {
-    gsap.fromTo('.card-sketches', 
-      { y: 50 }, 
+    gsap.fromTo('.card-sketches',
+      { y: 50 },
       {
         y: -50,
         scrollTrigger: {
@@ -1810,8 +2060,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     );
 
-    gsap.fromTo('.card-mockup', 
-      { y: 100 }, 
+    gsap.fromTo('.card-mockup',
+      { y: 100 },
       {
         y: -20,
         scrollTrigger: {
@@ -1823,8 +2073,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     );
 
-    gsap.fromTo('.card-swank', 
-      { y: 30 }, 
+    gsap.fromTo('.card-swank',
+      { y: 30 },
       {
         y: -70,
         scrollTrigger: {
@@ -1846,7 +2096,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ctx = canvas.getContext('2d');
     const isMobile = window.innerWidth <= 900;
-    
+
     let width = canvas.width = canvas.offsetWidth;
     let height = canvas.height = canvas.offsetHeight;
 
@@ -1902,7 +2152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Custom Web Audio API Synthesizer
     let synthCtx = null;
     let synthGain = null;
-    
+
     const pentatonicScale = [
       110.00, // A2
       123.47, // B2
@@ -2036,9 +2286,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (s === 0) {
-                   ctx.moveTo(ptX, ptY);
+                  ctx.moveTo(ptX, ptY);
                 } else {
-                   ctx.lineTo(ptX, ptY);
+                  ctx.lineTo(ptX, ptY);
                 }
               }
               ctx.stroke();
@@ -2062,6 +2312,224 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   initFooterCanvas();
+
+  // ==========================================
+  // CINEMATIC INTRO TIMELINE ANIMATION
+  // ==========================================
+  function playCinematicIntro(introOverlay) {
+    if (!introOverlay) return;
+
+    // Get all landing page components to animate/fade in later
+    const bgCanvas = document.getElementById('bg-canvas');
+    const webglContainer = document.getElementById('webgl-container');
+    const topBar = document.querySelector('.top-bar');
+    const heroContent = document.querySelector('.hero-content');
+    const centerpieceWrapper = document.querySelector('.centerpiece-logo-wrapper');
+    const credibilityBlock = document.querySelector('.credibility-block');
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+
+    // Hide landing page components initially
+    gsap.set([bgCanvas, webglContainer, topBar, heroContent, centerpieceWrapper, credibilityBlock, scrollIndicator], { opacity: 0 });
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        introOverlay.remove();
+      }
+    });
+
+    // Prepare logo segments dynamically
+    const segments = introOverlay.querySelectorAll('.logo-segment');
+    segments.forEach(seg => {
+      const length = seg.getTotalLength();
+      gsap.set(seg, {
+        strokeDasharray: length,
+        strokeDashoffset: length,
+        opacity: 0,
+        fill: 'rgba(26, 26, 26, 0)'
+      });
+    });
+
+    // 0.00–0.45s: Corner marks fade in at exact center
+    tl.to(introOverlay.querySelectorAll('.corner-mark'), {
+      opacity: 0.8,
+      duration: 0.45,
+      ease: 'power2.out'
+    }, 0.0);
+
+    // 0.45–1.20s: Corner marks expand outward to their 160px bounds
+    tl.to(introOverlay.querySelector('.corner-tl'), { top: 0, left: 0, duration: 0.75, ease: 'cubic-bezier(0.76, 0, 0.24, 1)' }, 0.45);
+    tl.to(introOverlay.querySelector('.corner-tr'), { top: 0, right: 0, duration: 0.75, ease: 'cubic-bezier(0.76, 0, 0.24, 1)' }, 0.45);
+    tl.to(introOverlay.querySelector('.corner-bl'), { bottom: 0, left: 0, duration: 0.75, ease: 'cubic-bezier(0.76, 0, 0.24, 1)' }, 0.45);
+    tl.to(introOverlay.querySelector('.corner-br'), { bottom: 0, right: 0, duration: 0.75, ease: 'cubic-bezier(0.76, 0, 0.24, 1)' }, 0.45);
+
+    // Draw the 1px square frame borders
+    const lines = introOverlay.querySelectorAll('.frame-line');
+    lines.forEach(line => {
+      gsap.set(line, { strokeDasharray: 160, strokeDashoffset: 160 });
+    });
+    // Top grows left-to-right, right grows top-to-bottom
+    tl.to(introOverlay.querySelector('.frame-line-top'), { strokeDashoffset: 0, duration: 0.75, ease: 'power2.out' }, 0.45);
+    tl.to(introOverlay.querySelector('.frame-line-right'), { strokeDashoffset: 0, duration: 0.75, ease: 'power2.out' }, 0.65);
+    // Bottom and left appear subtly
+    tl.to([introOverlay.querySelector('.frame-line-bottom'), introOverlay.querySelector('.frame-line-left')], {
+      strokeDashoffset: 0,
+      duration: 0.95,
+      ease: 'power1.out',
+      opacity: 0.4
+    }, 0.75);
+
+    // 0.90–2.90s: AUROZE logo segments assemble sequentially
+    segments.forEach((seg, idx) => {
+      const startTime = 0.90 + (idx * 0.45);
+      const slideDist = (idx % 2 === 0) ? -20 : 20;
+
+      tl.fromTo(seg, {
+        strokeDashoffset: seg.getTotalLength(),
+        opacity: 0,
+        x: slideDist,
+        y: slideDist * 0.5
+      }, {
+        strokeDashoffset: 0,
+        opacity: 0.5,
+        x: 0,
+        y: 0,
+        duration: 1.2,
+        ease: 'power2.out'
+      }, startTime);
+
+      // Transition outline to solid dark charcoal fill
+      tl.to(seg, {
+        fill: '#1a1a1a',
+        opacity: 1,
+        strokeWidth: 0,
+        duration: 0.8,
+        ease: 'power2.inOut'
+      }, startTime + 0.65);
+    });
+
+    // 1.50–2.40s: INSPIRE / INNOVATE / IMPACT and progress number appear
+    tl.to(introOverlay.querySelector('.intro-slogan'), {
+      opacity: 1,
+      duration: 0.6,
+      ease: 'power2.out'
+    }, 1.5);
+    tl.from(introOverlay.querySelectorAll('.slogan-word'), {
+      y: 10,
+      opacity: 0,
+      stagger: 0.2,
+      duration: 0.6,
+      ease: 'power2.out'
+    }, 1.5);
+
+    tl.to(introOverlay.querySelector('.intro-progress'), {
+      opacity: 1,
+      duration: 0.4,
+      ease: 'power1.out'
+    }, 1.5);
+
+    // Progress indicator steps
+    const progressEl = introOverlay.querySelector('.intro-progress');
+    tl.to(progressEl, { onStart: () => { progressEl.textContent = '0.12'; }, duration: 0.1 }, 1.5);
+    tl.to(progressEl, { onStart: () => { progressEl.textContent = '0.34'; }, duration: 0.1 }, 1.8);
+    tl.to(progressEl, { onStart: () => { progressEl.textContent = '0.68'; }, duration: 0.1 }, 2.1);
+    tl.to(progressEl, { onStart: () => { progressEl.textContent = '1.00'; }, duration: 0.1 }, 2.4);
+
+    // 2.90–3.70s: Holding composition briefly (wait inside timeline)
+
+    // 3.70–4.80s: Break logo apart - segments fly outward and scale up to block the screen
+    const seg1 = introOverlay.querySelector('.segment-1');
+    const seg2 = introOverlay.querySelector('.segment-2');
+    const seg3 = introOverlay.querySelector('.segment-3');
+    const seg4 = introOverlay.querySelector('.segment-4');
+
+    // Top-left shard
+    tl.to(seg1, {
+      x: -1800,
+      y: -1800,
+      scale: 65,
+      rotation: -75,
+      transformOrigin: '30% 30%',
+      duration: 1.25,
+      ease: 'power3.inOut'
+    }, 3.7);
+
+    // Top-right shard
+    tl.to(seg2, {
+      x: 1800,
+      y: -1000,
+      scale: 65,
+      rotation: 75,
+      transformOrigin: '70% 30%',
+      duration: 1.25,
+      ease: 'power3.inOut'
+    }, 3.7);
+
+    // Bottom-left shard
+    tl.to(seg3, {
+      x: -1400,
+      y: 1400,
+      scale: 65,
+      rotation: -45,
+      transformOrigin: '40% 70%',
+      duration: 1.25,
+      ease: 'power3.inOut'
+    }, 3.7);
+
+    // Bottom-right shard
+    tl.to(seg4, {
+      x: 1400,
+      y: 1800,
+      scale: 65,
+      rotation: 45,
+      transformOrigin: '70% 80%',
+      duration: 1.25,
+      ease: 'power3.inOut'
+    }, 3.7);
+
+    // Fade out framed borders, corner marks, and slogan elements early
+    tl.to([
+      introOverlay.querySelector('.intro-slogan'),
+      introOverlay.querySelector('.intro-progress'),
+      introOverlay.querySelectorAll('.frame-line'),
+      introOverlay.querySelectorAll('.corner-mark')
+    ], {
+      opacity: 0,
+      duration: 0.4,
+      ease: 'power2.out'
+    }, 3.7);
+
+    // Background color of the overlay transitions to black as pieces expand
+    tl.to(introOverlay, {
+      backgroundColor: '#040508',
+      duration: 1.0,
+      ease: 'power3.inOut'
+    }, 3.7);
+
+    // 4.35–5.20s: Fade out the entire black intro overlay, disabling pointer events instantly to make it non-interruptibly interactive and seamless
+    tl.set(introOverlay, { pointerEvents: 'none' }, 4.35);
+    tl.to(introOverlay, {
+      opacity: 0,
+      duration: 0.85,
+      ease: 'power2.inOut'
+    }, 4.35);
+
+    // 4.35–5.15s: Landing page fades & staggers in underneath
+    // Background first
+    tl.to([bgCanvas, webglContainer], { opacity: 1, duration: 0.8, ease: 'power2.out' }, 4.35);
+    // Navigation next
+    tl.to(topBar, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 4.55);
+    // Headline next
+    tl.to(heroContent, { opacity: 1, duration: 0.6, ease: 'power2.out' }, 4.65);
+    // Centerpiece logo next
+    tl.to(centerpieceWrapper, { opacity: 1, duration: 0.8, ease: 'power2.out' }, 4.75);
+    // Supporting elements last
+    tl.to([credibilityBlock, scrollIndicator], {
+      opacity: 1,
+      duration: 0.6,
+      ease: 'power2.out',
+      stagger: 0.1
+    }, 4.85);
+  }
 
   // Run scroll handler on scroll, and initially once to lock baseline values
   window.addEventListener('scroll', handleScrollEffects, { passive: true });

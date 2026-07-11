@@ -31,6 +31,44 @@
 
 <body>
 
+  <!-- Cinematic Intro Animation Overlay -->
+  <div class="cinematic-intro" id="cinematic-intro">
+    <div class="intro-content">
+      <div class="corner-mark corner-tl"></div>
+      <div class="corner-mark corner-tr"></div>
+      <div class="corner-mark corner-bl"></div>
+      <div class="corner-mark corner-br"></div>
+
+      <svg class="square-frame-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+        <line class="frame-line frame-line-top" x1="0" y1="0" x2="160" y2="0" />
+        <line class="frame-line frame-line-right" x1="160" y1="0" x2="160" y2="160" />
+        <line class="frame-line frame-line-bottom" x1="160" y1="160" x2="0" y2="160" />
+        <line class="frame-line frame-line-left" x1="0" y1="160" x2="0" y2="0" />
+      </svg>
+
+      <div class="intro-square-container">
+        <svg class="intro-logo-svg" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+          <path class="logo-segment segment-1"
+            d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z" />
+          <path class="logo-segment segment-2"
+            d="M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z" />
+          <path class="logo-segment segment-3"
+            d="M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z" />
+          <path class="logo-segment segment-4"
+            d="M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z" />
+        </svg>
+      </div>
+
+      <div class="intro-slogan">
+        <span class="slogan-word">INSPIRE</span>
+        <span class="slogan-word">INNOVATE</span>
+        <span class="slogan-word">IMPACT</span>
+      </div>
+
+      <div class="intro-progress">0.00</div>
+    </div>
+  </div>
+
   <canvas id="bg-canvas"></canvas>
 
   <div id="webgl-container"></div>
@@ -146,7 +184,9 @@
       </h1>
 
       <p class="hero-description">
-        We create premium websites, powerful web applications, Android &amp; iOS mobile apps, AI-driven software, and digital marketing solutions that help startups, businesses, and enterprises grow faster in today's digital world.
+        We create premium websites, powerful web applications, Android &amp; iOS mobile apps, AI-driven software, and
+        digital marketing solutions that help startups, businesses, and enterprises grow faster in today's digital
+        world.
       </p>
 
       <a href="#project" class="cta-project">
@@ -187,7 +227,9 @@
         </div>
       </div>
       <p class="credibility-desc">
-        Trusted by clients across the United Kingdom and Canada, Auroze delivers premium websites, web applications, mobile apps, AI solutions, digital marketing, branding, content creation, video production, SEO, and business automation designed to help businesses scale with confidence.
+        Trusted by clients across the United Kingdom and Canada, Auroze delivers premium websites, web applications,
+        mobile apps, AI solutions, digital marketing, branding, content creation, video production, SEO, and business
+        automation designed to help businesses scale with confidence.
       </p>
     </div>
 
@@ -202,17 +244,8 @@
   <section class="about-section" id="about">
     <!-- Background video -->
     <div class="about-video-bg" aria-hidden="true">
-      <video
-        class="about-bg-video"
-        src="assets/videos/AUROZE%20_%20Coming%20Soon.mp4"
-        autoplay
-        muted
-        loop
-        playsinline
-        webkit-playsinline
-        preload="auto"
-        disablepictureinpicture
-      ></video>
+      <video class="about-bg-video" src="assets/videos/AUROZE%20_%20Coming%20Soon.mp4" autoplay muted loop playsinline
+        webkit-playsinline preload="auto" disablepictureinpicture></video>
       <div class="about-video-scrim"></div>
     </div>
 
@@ -345,57 +378,113 @@
 
   <!-- KEY FACTS — 3 Card Layout -->
   <section class="key-facts-section" id="facts">
-    <div class="kf-bg" aria-hidden="true">
-      <video
-        class="kf-bg-video"
-        src="assets/videos/air_bg.mp4"
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="metadata"
-      ></video>
-      <div class="kf-bg-scrim"></div>
-      <div class="kf-bg-grid"></div>
-      <div class="kf-bg-glow"></div>
-      <div class="kf-bg-noise"></div>
-      <canvas class="kf-bg-particles" id="kf-particles"></canvas>
-    </div>
-
     <div class="key-facts-container">
-      <header class="kf-section-header">
-        <span class="facts-eyebrow">KEY FACTS</span>
-        <h2 class="facts-headline">
-          Our Journey.<br>
-          Our Team.<br>
-          <span>Our Impact.</span>
-        </h2>
-        <p class="facts-subtext">
-          Every milestone reflects our passion for innovation, creativity, and engineering. Behind every project is a dedicated team committed to building exceptional digital experiences for clients around the world.
-        </p>
-      </header>
+      <div class="facts-eyebrow">KEY FACTS</div>
 
-      <div class="kf-cards-grid kf-cards-grid--three">
-        <!-- Left — Success Projects -->
-        <article class="key-fact-card kf-card kf-card--projects kf-card--dark" data-kf-card data-tilt>
-          <div class="kf-card-border"></div>
-          <div class="kf-card-shine"></div>
-          <div class="kf-card-bg-shift" aria-hidden="true"></div>
-          <div class="kf-card-inner">
-            <header class="kf-card-top-label">
-              <span>SUCCESS PROJECTS</span>
-              <span class="kf-card-index">01</span>
-            </header>
-            <div class="kf-card-visual kf-card-visual--cycle">
-              <div class="kf-cycle-stage" data-project-cycle aria-live="polite">
-                <span class="kf-cycle-text" data-cycle-text>Products</span>
+      <div class="facts-layout">
+        <!-- Left Side: Fixed Column -->
+        <div class="facts-left-col">
+          <h2 class="facts-headline">
+            Numbers that<br>
+            <span>define our design</span>
+          </h2>
+          <p class="facts-subtext">
+            Every digit holds a story of trust, meticulous craft, and business-altering results. We don't just shape
+            pixels; we build systems designed to scale and endure.
+          </p>
+
+          <!-- Bottom-Left Pagination Indicator -->
+          <div class="facts-pagination">
+            <span class="pag-label">ACTIVE</span>
+            <div class="pag-num-container">
+              <div class="pag-num-slider">
+                <div>01</div>
+                <div>02</div>
+                <div>03</div>
+                <div>04</div>
+                <div>05</div>
               </div>
             </div>
-            <footer class="kf-card-footer">
-              <p class="kf-card-footnote">Delivered impactful digital solutions for startups and established businesses worldwide.</p>
-              <div class="kf-card-stat-wrap">
-                <span class="kf-card-stat" data-count="10">0</span>
-                <span class="kf-card-stat-suffix">+</span>
+            <div class="pag-progress-line">
+              <div class="pag-progress-fill"></div>
+            </div>
+            <div class="pag-total">05</div>
+          </div>
+        </div>
+
+        <!-- Right Side: Card Deck Stack -->
+        <div class="facts-right-col">
+          <div class="card-deck">
+
+            <!-- Card 1: Featured & Awards -->
+            <div class="key-fact-card" data-index="1">
+              <div class="card-header">
+                <span>FEATURED & AWARDS</span>
+                <span class="card-index">01</span>
+              </div>
+              <div class="card-body">
+                <div class="video-container">
+                  <!-- Auto-playing muted video loop (spinning award trophy) -->
+                  <video class="card-video" src="https://cdn.pixabay.com/video/2021/04/12/70868-537449552_tiny.mp4"
+                    autoplay loop muted playsinline></video>
+                  <div class="video-overlay-effects">
+                    <div class="scanner-line"></div>
+                    <div class="scan-grid"></div>
+                  </div>
+                </div>
+                <div class="card-caption">
+                  FEATURED ON TOP DESIGN PLATFORMS WORLDWIDE
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="logos-row">
+                  <span class="logo-item">Awwwards</span>
+                  <span class="logo-item">CSSDA</span>
+                  <span class="logo-item">The FWA</span>
+                  <span class="logo-item">CSSWinner</span>
+                  <span class="logo-item">A' Design</span>
+                  <span class="logo-item">GSAP</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Projects Completed -->
+            <div class="key-fact-card" data-index="2">
+              <div class="card-header">
+                <span>PROJECTS COMPLETED</span>
+                <span class="card-index">02</span>
+              </div>
+              <div class="card-body centered-body">
+                <div class="starburst-decor">
+                  <!-- Matte black rotating spiced-flower / starburst SVG -->
+                  <svg class="starburst-svg" viewBox="0 0 200 200">
+                    <defs>
+                      <radialGradient id="spiked-grad" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#14151a" />
+                        <stop offset="60%" stop-color="#0c0d10" />
+                        <stop offset="100%" stop-color="#040508" />
+                      </radialGradient>
+                    </defs>
+                    <g class="starburst-ring-outer">
+                      <polygon points="100,10 108,70 170,100 108,130 100,190 92,130 30,100 92,70"
+                        fill="url(#spiked-grad)" stroke="rgba(255, 255, 255, 0.08)" stroke-width="1.5" />
+                      <polygon points="100,20 106,75 160,100 106,125 100,180 94,125 40,100 94,75"
+                        fill="url(#spiked-grad)" stroke="rgba(255, 95, 0, 0.2)" stroke-width="1"
+                        transform="rotate(22.5 100 100)" />
+                      <polygon points="100,30 105,80 150,100 105,120 100,170 95,120 50,100 95,80"
+                        fill="url(#spiked-grad)" stroke="rgba(255, 255, 255, 0.04)" stroke-width="1"
+                        transform="rotate(45 100 100)" />
+                      <polygon points="100,40 104,85 140,100 104,115 100,160 96,115 60,100 96,85"
+                        fill="url(#spiked-grad)" stroke="rgba(255, 95, 0, 0.1)" stroke-width="1"
+                        transform="rotate(67.5 100 100)" />
+                    </g>
+                    <circle cx="100" cy="100" r="10" fill="#040508" stroke="rgba(255, 95, 0, 0.5)" stroke-width="1" />
+                  </svg>
+                </div>
+                <div class="giant-num">050+</div>
+                <div class="card-caption">
+                  CRAFTED DIGITAL PRODUCTS BUILT FOR LONGEVITY
+                </div>
               </div>
             </footer>
             <div class="kf-progress-track">
@@ -437,25 +526,31 @@
               <div class="kf-spotlight-orbit" aria-hidden="true"></div>
               <div class="kf-spotlight-hint">Hover to unveil</div>
             </div>
-            <footer class="kf-card-footer kf-card-footer--center">
-              <p class="kf-card-footnote">Building Digital Excellence — premium digital products crafted for businesses worldwide.</p>
-            </footer>
-          </div>
-        </article>
 
-        <!-- Right — Partners -->
-        <article class="key-fact-card kf-card kf-card--partners kf-card--dark" data-kf-card data-tilt>
-          <div class="kf-card-border"></div>
-          <div class="kf-card-shine"></div>
-          <div class="kf-card-inner">
-            <header class="kf-card-top-label">
-              <span>GLOBAL PARTNERS</span>
-              <span class="kf-card-index">03</span>
-            </header>
-            <div class="kf-card-visual kf-card-visual--partner-cycle">
-              <div class="kf-partner-cycle-stage" data-partner-cycle aria-live="polite">
-                <span class="kf-partner-cycle-country" data-partner-cycle-country>United Kingdom</span>
-                <span class="kf-partner-cycle-name" data-partner-cycle-name>Regal International College</span>
+            <!-- Card 4: Team Members -->
+            <div class="key-fact-card" data-index="4">
+              <div class="card-header">
+                <span>TEAM MEMBERS</span>
+                <span class="card-index">04</span>
+              </div>
+              <div class="card-body">
+                <div class="team-slider-wrapper">
+                  <div class="team-track">
+                    <img class="team-slide-img active"
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=350&h=350&q=80"
+                      alt="Creative Lead">
+                    <img class="team-slide-img"
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=350&h=350&q=80"
+                      alt="Technical Architect">
+                    <img class="team-slide-img"
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=350&h=350&q=80"
+                      alt="Interaction Designer">
+                  </div>
+                  <div class="avatar-shading"></div>
+                </div>
+                <div class="card-caption">
+                  DIFFERENT SKILLS. ONE STANDARD.
+                </div>
               </div>
             </div>
             <footer class="kf-card-footer">
@@ -475,7 +570,8 @@
   <section class="selected-work-section" id="work">
     <div class="work-stage">
       <div class="work-horizontal-track">
-        <!-- Intro -->
+
+        <!-- Intro Slide (Left portion of horizontal track) -->
         <div class="work-slide intro-slide">
           <div class="intro-slide-content" data-work-intro>
             <h2 class="work-headline">
@@ -631,7 +727,9 @@
             <div class="slab-face slab-front">
               <!-- Carved Auroze Logo -->
               <svg class="slab-carved-logo" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
-                <path d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z" fill-rule="evenodd" />
+                <path
+                  d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+                  fill-rule="evenodd" />
               </svg>
             </div>
             <div class="slab-face slab-back"></div>
@@ -659,7 +757,7 @@
       </div>
 
       <div class="services-tagline">✦ DIFFERENT DISCIPLINES. ONE STANDARD OF CRAFT.</div>
-      
+
       <a href="/services" class="cta-services-footer">
         <span class="cta-text">VIEW SERVICES</span>
         <span class="cta-arrow">→</span>
@@ -690,7 +788,8 @@
         <!-- Testimonial 1 -->
         <div class="testimonial-card">
           <blockquote class="testimonial-quote">
-            "Auroze redefined our entire digital platform. Their craft and execution brought a level of clarity and scale we didn't think was possible."
+            "Auroze redefined our entire digital platform. Their craft and execution brought a level of clarity and
+            scale we didn't think was possible."
           </blockquote>
           <div class="testimonial-author">
             <span class="author-name">ALEX VERMEULEN</span>
@@ -701,7 +800,8 @@
         <!-- Testimonial 2 -->
         <div class="testimonial-card">
           <blockquote class="testimonial-quote">
-            "Every phase of our partnership was built on trust and a shared standard of craft. The results speak for themselves."
+            "Every phase of our partnership was built on trust and a shared standard of craft. The results speak for
+            themselves."
           </blockquote>
           <div class="testimonial-author">
             <span class="author-name">SARAH CHEN</span>
@@ -726,13 +826,15 @@
   <!-- SECTION C: EXPLORATIONS / DRIBBBLE GALLERY -->
   <section class="explorations-section" id="journal">
     <div class="explorations-container">
-      
+
       <!-- Masonry Collage -->
       <div class="explorations-collage">
-        
+
         <!-- Card 1: Loose Sketches -->
         <div class="collage-card card-sketches">
-          <div class="card-image-bg" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80')"></div>
+          <div class="card-image-bg"
+            style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=400&q=80')">
+          </div>
           <div class="card-inner-overlay">
             <span class="card-badge">AI</span>
             <div class="card-title-main">LOOSE SKETCHES TO VISUALIZATIONS</div>
@@ -742,7 +844,9 @@
 
         <!-- Card 2: Website Mockup Card -->
         <div class="collage-card card-mockup">
-          <div class="card-image-bg" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80')"></div>
+          <div class="card-image-bg"
+            style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80')">
+          </div>
           <div class="card-inner-overlay">
             <span class="card-badge">WEB</span>
             <div class="card-title-main">WE BRING IMAGINATION TO LIFE.</div>
@@ -751,7 +855,9 @@
 
         <!-- Card 3: Swank Branding -->
         <div class="collage-card card-swank">
-          <div class="card-image-bg" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80')"></div>
+          <div class="card-image-bg"
+            style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80')">
+          </div>
           <div class="card-inner-overlay">
             <span class="card-brand">SWANK®</span>
             <span class="card-microcopy">STYLE DEFINES CHARACTER</span>
@@ -784,7 +890,7 @@
           Ready to build<br>
           something bold?
         </h2>
-        
+
         <a href="mailto:hello@auroze.com" class="cta-collab">
           <span class="cta-text">START A COLLABORATION</span>
           <span class="cta-arrow">→</span>

@@ -5028,3 +5028,147 @@ body:not(.light-theme-active) .services-eyebrow {
     height: 200px;
   }
 }
+
+/* ==========================================
+   CINEMATIC INTRO OVERLAY
+   ========================================== */
+.cinematic-intro {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.intro-content {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.corner-mark {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-color: rgba(26, 26, 26, 0.45);
+  border-style: solid;
+  opacity: 0;
+  will-change: top, left, right, bottom, opacity;
+}
+
+.corner-tl {
+  top: 77px;
+  left: 77px;
+  border-width: 1px 0 0 1px;
+}
+
+.corner-tr {
+  top: 77px;
+  right: 77px;
+  border-width: 1px 1px 0 0;
+}
+
+.corner-bl {
+  bottom: 77px;
+  left: 77px;
+  border-width: 0 0 1px 1px;
+}
+
+.corner-br {
+  bottom: 77px;
+  right: 77px;
+  border-width: 0 1px 1px 0;
+}
+
+.square-frame-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 160px;
+  height: 160px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.frame-line {
+  stroke: rgba(26, 26, 26, 0.16);
+  stroke-width: 1px;
+  fill: none;
+  stroke-dasharray: 160;
+  stroke-dashoffset: 160;
+  will-change: stroke-dashoffset, opacity;
+}
+
+.intro-square-container {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  overflow: visible;
+}
+
+.intro-logo-svg {
+  width: 90px;
+  height: 90px;
+  overflow: visible;
+}
+
+.logo-segment {
+  fill: transparent;
+  stroke: rgba(26, 26, 26, 0.2);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  will-change: stroke-dashoffset, fill, opacity, transform;
+}
+
+.intro-slogan {
+  position: absolute;
+  bottom: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  z-index: 4;
+  will-change: opacity, transform;
+}
+
+.slogan-word {
+  font-family: var(--font-ui);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 2.2px;
+  color: rgba(26, 26, 26, 0.7);
+}
+
+.intro-progress {
+  position: absolute;
+  bottom: -64px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: rgba(26, 26, 26, 0.45);
+  opacity: 0;
+  z-index: 4;
+  will-change: opacity;
+}
