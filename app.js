@@ -1086,114 +1086,376 @@ document.addEventListener('DOMContentLoaded', () => {
   initSloganMagicHover();
 
   // ==========================================
-  // 10. KEY FACTS PINNED DECK SCROLL ANIMATION
+  // 10. KEY FACTS — JOURNEY / TEAM / IMPACT
   // ==========================================
 
-  const factsSection = document.querySelector('.key-facts-section');
-  const cards = gsap.utils.toArray('.key-fact-card');
+  const initKeyFactsSection = () => {
+    const factsSection = document.querySelector('.key-facts-section');
+    const cards = gsap.utils.toArray('.kf-card');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (factsSection && cards.length > 0) {
-    const isMobile = window.innerWidth <= 900;
-    const offsetX = isMobile ? 6 : 10;
-    const offsetY = isMobile ? 10 : 15;
+    if (!factsSection || !cards.length) return;
 
-    // Set initial card deck layout (staggered offset and layered z-indexes)
-    gsap.set(cards, {
-      x: (i) => i * offsetX,
-      y: (i) => i * offsetY,
-      scale: (i) => 1 - i * 0.04,
-      transformOrigin: 'center bottom',
-      zIndex: (i) => cards.length - i
-    });
-
-    // Create GSAP ScrollTrigger timeline to pin and animate cards
-    const tl = gsap.timeline({
-      smoothChildTiming: true,
-      scrollTrigger: {
-        trigger: '.key-facts-section',
-        start: 'top top',
-        end: '+=400%',
-        pin: true,
-        scrub: 1.2,
-        fastScrollEnd: true,
-        anticipatePin: 0,
-        invalidateOnRefresh: true
+    const kfBgVideo = factsSection.querySelector('.kf-bg-video');
+    if (kfBgVideo) {
+      kfBgVideo.muted = true;
+      if (!prefersReducedMotion) {
+        const playKfVideo = () => {
+          const promise = kfBgVideo.play();
+          if (promise && typeof promise.catch === 'function') promise.catch(() => {});
+        };
+        ScrollTrigger.create({
+          trigger: factsSection,
+          start: 'top bottom',
+          end: 'bottom top',
+          onEnter: playKfVideo,
+          onEnterBack: playKfVideo,
+          onLeave: () => kfBgVideo.pause(),
+          onLeaveBack: () => kfBgVideo.pause()
+        });
+        if (factsSection.getBoundingClientRect().top < window.innerHeight) playKfVideo();
       }
-    });
+    }
 
-    // Animate cards swipe out and background cards scaling up
-    cards.forEach((card, index) => {
-      if (index < cards.length - 1) {
-        // Swipe current card out to the top-left with rotation and fade
-        tl.to(card, {
-          y: '-135%',
-          x: `-=${isMobile ? 15 : 25}`,
-          rotation: -12,
+    cards.forEach((card) => card.classList.add('is-reveal-pending'));
+    gsap.set(cards, { transformPerspective: 900 });
+
+    if (!prefersReducedMotion) {
+      const revealTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.kf-cards-grid--three',
+          start: 'top 85%',
+          once: true,
+          invalidateOnRefresh: true
+        }
+      });
+
+      cards.forEach((card, index) => {
+        revealTl.fromTo(card, {
           opacity: 0,
+          y: 72,
           scale: 0.9,
-          ease: 'power2.inOut',
-          duration: 1
-        }, index);
+          rotateY: index === 0 ? -10 : index === 2 ? 10 : 0,
+          filter: 'blur(12px)'
+        }, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          rotateY: 0,
+          filter: 'blur(0px)',
+          duration: 1,
+          ease: 'power4.out',
+          onStart: () => card.classList.remove('is-reveal-pending')
+        }, index * 0.16);
+      });
 
-        // Bring subsequent cards forward in the stack hierarchy
-        for (let i = index + 1; i < cards.length; i++) {
-          const relIdx = i - index - 1;
-          tl.to(cards[i], {
-            x: relIdx * offsetX,
-            y: relIdx * offsetY,
-            scale: 1 - relIdx * 0.04,
-            ease: 'power2.inOut',
-            duration: 1
-          }, index);
+      // Left card — center cycle + counter
+      const projectsCard = document.querySelector('.kf-card--projects');
+      const cycleText = projectsCard?.querySelector('[data-cycle-text]');
+      const projectsCountEl = projectsCard?.querySelector('[data-count]');
+      const cycleItems = ['Products', 'Websites', 'POS System', 'Mobile & Web'];
+      let cycleTl = null;
+
+      if (projectsCard && cycleText) {
+        const buildCycleTimeline = () => {
+          const tl = gsap.timeline({ paused: true, repeat: -1 });
+          cycleItems.forEach((label, index) => {
+            if (index === 0) {
+              tl.set(cycleText, { textContent: label, opacity: 1, y: 0 });
+            } else {
+              tl.to(cycleText, {
+                opacity: 0,
+                y: -14,
+                duration: 0.4,
+                ease: 'power2.in'
+              });
+              tl.call(() => {
+                cycleText.textContent = label;
+              });
+              tl.fromTo(cycleText,
+                { opacity: 0, y: 16 },
+                { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
+              );
+            }
+            tl.to({}, { duration: 2 });
+          });
+          return tl;
+        };
+
+        cycleTl = buildCycleTimeline();
+
+        ScrollTrigger.create({
+          trigger: projectsCard,
+          start: 'top 85%',
+          end: 'bottom 15%',
+          onEnter: () => cycleTl.play(),
+          onEnterBack: () => cycleTl.play(),
+          onLeave: () => cycleTl.pause(),
+          onLeaveBack: () => cycleTl.pause()
+        });
+
+        if (projectsCard.getBoundingClientRect().top < window.innerHeight * 0.85) {
+          cycleTl.play();
         }
       }
+
+      if (projectsCard && projectsCountEl) {
+          const target = parseInt(projectsCountEl.dataset.count, 10);
+          const counter = { val: 0 };
+          gsap.to(counter, {
+            val: target,
+            duration: 1.6,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: projectsCard,
+              start: 'top 80%',
+              once: true
+            },
+            onUpdate: () => {
+              projectsCountEl.textContent = Math.round(counter.val);
+            },
+            onComplete: () => projectsCard.classList.add('is-counted')
+          });
+      }
+
+      // Right card — center partner cycle (like card 01)
+      const partnersCard = document.querySelector('.kf-card--partners');
+      const partnerCountryEl = partnersCard?.querySelector('[data-partner-cycle-country]');
+      const partnerNameEl = partnersCard?.querySelector('[data-partner-cycle-name]');
+      const partnerCycleItems = [
+        { country: 'United Kingdom', name: 'Regal International College' },
+        { country: 'Canada', name: 'Strategic Partner' },
+        { country: 'Sri Lanka', name: 'Coastal Creatives' }
+      ];
+      let partnerCycleTl = null;
+
+      if (partnersCard && partnerCountryEl && partnerNameEl) {
+        const cycleEls = [partnerCountryEl, partnerNameEl];
+
+        const buildPartnerCycleTimeline = () => {
+          const tl = gsap.timeline({ paused: true, repeat: -1 });
+
+          partnerCycleItems.forEach((partner, index) => {
+            if (index === 0) {
+              tl.set(partnerCountryEl, { textContent: partner.country });
+              tl.set(partnerNameEl, { textContent: partner.name });
+              tl.set(cycleEls, { opacity: 1, y: 0 });
+            } else {
+              tl.to(cycleEls, {
+                opacity: 0,
+                y: -12,
+                duration: 0.4,
+                ease: 'power2.in'
+              });
+              tl.call(() => {
+                partnerCountryEl.textContent = partner.country;
+                partnerNameEl.textContent = partner.name;
+              });
+              tl.fromTo(cycleEls,
+                { opacity: 0, y: 14 },
+                { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' }
+              );
+            }
+            tl.to({}, { duration: 2 });
+          });
+
+          return tl;
+        };
+
+        partnerCycleTl = buildPartnerCycleTimeline();
+
+        ScrollTrigger.create({
+          trigger: partnersCard,
+          start: 'top 85%',
+          end: 'bottom 15%',
+          onEnter: () => partnerCycleTl.play(),
+          onEnterBack: () => partnerCycleTl.play(),
+          onLeave: () => partnerCycleTl.pause(),
+          onLeaveBack: () => partnerCycleTl.pause()
+        });
+
+        if (partnersCard.getBoundingClientRect().top < window.innerHeight * 0.85) {
+          partnerCycleTl.play();
+        }
+      }
+    } else {
+      cards.forEach((card) => {
+        card.classList.remove('is-reveal-pending');
+        gsap.set(card, { opacity: 1, y: 0, scale: 1 });
+      });
+      document.querySelectorAll('[data-count]').forEach((el) => {
+        el.textContent = el.dataset.count;
+      });
+      const cycleText = document.querySelector('.kf-card--projects [data-cycle-text]');
+      if (cycleText) cycleText.textContent = 'Products';
+      document.querySelector('.kf-card--projects')?.classList.add('is-counted');
+      const partnerCountryEl = document.querySelector('.kf-card--partners [data-partner-cycle-country]');
+      const partnerNameEl = document.querySelector('.kf-card--partners [data-partner-cycle-name]');
+      if (partnerCountryEl) partnerCountryEl.textContent = 'United Kingdom';
+      if (partnerNameEl) partnerNameEl.textContent = 'Regal International College';
+    }
+
+    // Background particles (lightweight)
+    const particleCanvas = document.getElementById('kf-particles');
+    if (particleCanvas && !prefersReducedMotion) {
+      const ctx = particleCanvas.getContext('2d');
+      let particles = [];
+      let rafId = null;
+      let width = 0;
+      let height = 0;
+
+      const resize = () => {
+        const rect = factsSection.getBoundingClientRect();
+        width = particleCanvas.width = Math.floor(rect.width);
+        height = particleCanvas.height = Math.floor(rect.height);
+        const count = window.innerWidth <= 600 ? 18 : 32;
+        particles = Array.from({ length: count }, () => ({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          r: Math.random() * 1.2 + 0.4,
+          vx: (Math.random() - 0.5) * 0.18,
+          vy: (Math.random() - 0.5) * 0.18,
+          a: Math.random() * 0.35 + 0.15
+        }));
+      };
+
+      const draw = () => {
+        if (!ctx) return;
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 95, 0, ${p.a})`;
+          ctx.fill();
+        });
+        rafId = requestAnimationFrame(draw);
+      };
+
+      const startParticles = () => {
+        resize();
+        if (!rafId) rafId = requestAnimationFrame(draw);
+      };
+
+      const stopParticles = () => {
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      };
+
+      ScrollTrigger.create({
+        trigger: factsSection,
+        start: 'top bottom',
+        end: 'bottom top',
+        onEnter: startParticles,
+        onEnterBack: startParticles,
+        onLeave: stopParticles,
+        onLeaveBack: stopParticles
+      });
+
+      window.addEventListener('resize', resize);
+      if (factsSection.getBoundingClientRect().top < window.innerHeight) startParticles();
+    }
+
+    // Center card — auto orbit spotlight + hover full reveal
+    const spotlightStage = document.querySelector('[data-spotlight]');
+    if (spotlightStage && !prefersReducedMotion) {
+      let angle = 0;
+      let orbitActive = false;
+      let isHovered = false;
+      let rafSpot = null;
+      const orbitRx = 27;
+      const orbitRy = 21;
+
+      const tick = () => {
+        if (orbitActive && !isHovered) {
+          angle += 0.016;
+          const wobble = Math.sin(angle * 2.4) * 4;
+          const cx = 50 + Math.cos(angle) * (orbitRx + wobble);
+          const cy = 50 + Math.sin(angle) * (orbitRy + wobble * 0.6);
+          spotlightStage.style.setProperty('--mx', `${cx}%`);
+          spotlightStage.style.setProperty('--my', `${cy}%`);
+          spotlightStage.classList.add('is-auto');
+        }
+        rafSpot = requestAnimationFrame(tick);
+      };
+
+      const startOrbit = () => {
+        if (!rafSpot) rafSpot = requestAnimationFrame(tick);
+        orbitActive = true;
+      };
+
+      const stopOrbit = () => {
+        orbitActive = false;
+        if (rafSpot) {
+          cancelAnimationFrame(rafSpot);
+          rafSpot = null;
+        }
+      };
+
+      spotlightStage.addEventListener('mouseenter', () => {
+        isHovered = true;
+        spotlightStage.classList.add('is-hovered');
+        spotlightStage.classList.remove('is-auto');
+      }, { passive: true });
+
+      spotlightStage.addEventListener('mouseleave', () => {
+        isHovered = false;
+        spotlightStage.classList.remove('is-hovered');
+      }, { passive: true });
+
+      ScrollTrigger.create({
+        trigger: spotlightStage,
+        start: 'top 88%',
+        end: 'bottom 12%',
+        onEnter: startOrbit,
+        onEnterBack: startOrbit,
+        onLeave: stopOrbit,
+        onLeaveBack: stopOrbit
+      });
+
+      if (spotlightStage.getBoundingClientRect().top < window.innerHeight * 0.88) {
+        startOrbit();
+      }
+    } else if (spotlightStage) {
+      spotlightStage.classList.add('is-hovered');
+    }
+
+    // Magnetic tilt on cards
+    const tiltCards = prefersReducedMotion ? [] : gsap.utils.toArray('[data-tilt]');
+    tiltCards.forEach((card) => {
+      const rotateXTo = gsap.quickTo(card, 'rotateX', { duration: 0.45, ease: 'power2.out' });
+      const rotateYTo = gsap.quickTo(card, 'rotateY', { duration: 0.45, ease: 'power2.out' });
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        rotateYTo(px * 8);
+        rotateXTo(-py * 8);
+      }, { passive: true });
+
+      card.addEventListener('mouseleave', () => {
+        rotateXTo(0);
+        rotateYTo(0);
+      }, { passive: true });
     });
+  };
 
-    // Animate progress line scaling from 20% to 100%
-    tl.to('.pag-progress-fill', {
-      scaleX: 1.0,
-      ease: 'none',
-      duration: cards.length - 1
-    }, 0);
-
-    // Animate pagination slider ticker to slide up numbers
-    tl.to('.pag-num-slider', {
-      yPercent: -80, // Slide up by 80% to show the last index "05"
-      ease: 'none',
-      duration: cards.length - 1
-    }, 0);
-  }
-
-  // ==========================================
-  // 11. CARD MICRO-INTERACTIONS (FLIPS & CYCLES)
-  // ==========================================
-  // Card 3: 3D Flip every 3.5 seconds
-  const card3Inner = document.querySelector('.card-3-inner');
-  if (card3Inner) {
-    setInterval(() => {
-      card3Inner.classList.toggle('flipped');
-    }, 3500);
-  }
-
-  // Card 4: Cross-fade team members
-  const teamImages = document.querySelectorAll('.team-slide-img');
-  let currentTeamIdx = 0;
-  if (teamImages.length > 0) {
-    setInterval(() => {
-      teamImages[currentTeamIdx].classList.remove('active');
-      currentTeamIdx = (currentTeamIdx + 1) % teamImages.length;
-      teamImages[currentTeamIdx].classList.add('active');
-    }, 2800);
-  }
+  initKeyFactsSection();
 
   // ==========================================
   // 12. SELECTED WORK THEME FLIP & HORIZONTAL SCROLL
   // ==========================================
   const workSection = document.querySelector('.selected-work-section');
   const horizontalTrack = document.querySelector('.work-horizontal-track');
+  const workIntro = document.querySelector('[data-work-intro]');
 
   if (workSection && horizontalTrack) {
-    // 12a. Toggle Light Theme active state on body
     ScrollTrigger.create({
       trigger: '.selected-work-section',
       start: 'top 50%',
@@ -1202,48 +1464,91 @@ document.addEventListener('DOMContentLoaded', () => {
       invalidateOnRefresh: true
     });
 
-    // 12b. GSAP MatchMedia to handle Desktop horizontal scroll pin
     const mm = gsap.matchMedia();
 
-    mm.add("(min-width: 901px)", () => {
-      // Horizontal slide animation translating the track left
+    mm.add('(min-width: 901px)', () => {
+      const getScrollDistance = () => Math.max(0, horizontalTrack.scrollWidth - window.innerWidth);
+
       const horizontalScrollTween = gsap.to(horizontalTrack, {
-        x: () => -(horizontalTrack.scrollWidth - window.innerWidth),
+        x: () => -getScrollDistance(),
         ease: 'none',
         scrollTrigger: {
           trigger: '.selected-work-section',
           pin: true,
-          scrub: 1.2,
+          scrub: 1,
           start: 'top top',
-          end: () => `+=${horizontalTrack.scrollWidth - window.innerWidth}`,
-          invalidateOnRefresh: true
+          end: () => `+=${getScrollDistance()}`,
+          invalidateOnRefresh: true,
+          anticipatePin: 1
         }
       });
 
-      // Card scaling transitions on entry (linked to containerAnimation)
-      const projectCards = gsap.utils.toArray('.project-slide .project-card');
-      projectCards.forEach((card) => {
+      if (workIntro) {
+        gsap.to(workIntro, {
+          x: () => -window.innerWidth * 0.35,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '.selected-work-section',
+            start: 'top top',
+            end: () => `+=${getScrollDistance() * 0.4}`,
+            scrub: 1,
+            invalidateOnRefresh: true
+          }
+        });
+      }
+
+      gsap.utils.toArray('.project-slide .project-card').forEach((card) => {
         gsap.fromTo(card,
-          { scale: 0.94, opacity: 0.75 },
+          { x: -180, y: 140, opacity: 0, scale: 0.88 },
           {
-            scale: 1.0,
-            opacity: 1.0,
-            ease: 'power1.out',
+            x: 0,
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            ease: 'power2.out',
             scrollTrigger: {
               trigger: card,
               containerAnimation: horizontalScrollTween,
-              start: 'left 95%',
-              end: 'left 50%',
-              scrub: true
+              start: 'left 100%',
+              end: 'left 48%',
+              scrub: 1
             }
           }
         );
       });
 
-      // Cleanup function when resizing below 901px
+      const outroContent = document.querySelector('.outro-slide-content');
+      if (outroContent) {
+        gsap.fromTo(outroContent,
+          { x: -80, y: 40, opacity: 0 },
+          {
+            x: 0,
+            y: 0,
+            opacity: 1,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: outroContent,
+              containerAnimation: horizontalScrollTween,
+              start: 'left 95%',
+              end: 'left 60%',
+              scrub: 1
+            }
+          }
+        );
+      }
+
       return () => {
-        gsap.set(horizontalTrack, { x: 0 });
+        gsap.set(horizontalTrack, { x: 0, clearProps: 'transform' });
+        if (workIntro) gsap.set(workIntro, { clearProps: 'transform' });
       };
+    });
+
+    mm.add('(max-width: 900px)', () => {
+      gsap.set(horizontalTrack, { x: 0, clearProps: 'transform' });
+      if (workIntro) gsap.set(workIntro, { clearProps: 'transform' });
+      gsap.utils.toArray('.project-slide .project-card, .outro-slide-content').forEach((el) => {
+        gsap.set(el, { clearProps: 'all' });
+      });
     });
   }
 
