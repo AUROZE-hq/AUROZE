@@ -1673,25 +1673,397 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
+  // 12b. SERVICES LIGHTNING STORM (realistic)
+  // ==========================================
+  function initServicesLightning(section) {
+    const canvas = section.querySelector('.services-lightning-canvas');
+    const flash = section.querySelector('.services-lightning-flash');
+    const haze = section.querySelector('.services-lightning-haze');
+    if (!canvas || !flash || !haze) return null;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return null;
+
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let strikeTimer = null;
+    let fadeTimer = null;
+    let hazeTimer = null;
+    let activeBolts = [];
+    let rafId = null;
+    let isRunning = false;
+    let lastFrame = 0;
+
+    const resize = () => {
+      const rect = section.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = Math.max(1, Math.floor(rect.width));
+      height = Math.max(1, Math.floor(rect.height));
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const randomBetween = (min, max) => min + Math.random() * (max - min);
+
+    const fractalBolt = (x1, y1, x2, y2, displacement) => {
+      if (displacement < 2) {
+        return [{ x: x1, y: y1 }, { x: x2, y: y2 }];
+      }
+
+      const midX = (x1 + x2) / 2 + (Math.random() - 0.5) * displacement;
+      const midY = (y1 + y2) / 2 + (Math.random() - 0.5) * displacement * 0.18;
+      const left = fractalBolt(x1, y1, midX, midY, displacement * 0.62);
+      const right = fractalBolt(midX, midY, x2, y2, displacement * 0.62);
+      return left.slice(0, -1).concat(right);
+    };
+
+    const buildBolt = (startX, cloudY, groundY, spread) => {
+      const endX = startX + randomBetween(-spread * 0.65, spread * 0.65);
+      return fractalBolt(startX, cloudY, endX, groundY, spread);
+    };
+
+    const buildBranches = (mainBolt, intensity) => {
+      const branches = [];
+      if (intensity < 0.55 || Math.random() > 0.55) return branches;
+
+      const branchCount = Math.random() > 0.7 ? 2 : 1;
+      for (let i = 0; i < branchCount; i += 1) {
+        const index = Math.floor(randomBetween(3, mainBolt.length - 4));
+        const origin = mainBolt[index];
+        const next = mainBolt[index + 1] || origin;
+        const angle = Math.atan2(next.y - origin.y, next.x - origin.x);
+        const branchLen = randomBetween(height * 0.04, height * 0.12);
+        const branchAngle = angle + randomBetween(-0.9, 0.9);
+        const endX = origin.x + Math.cos(branchAngle) * branchLen;
+        const endY = origin.y + Math.sin(branchAngle) * branchLen;
+        branches.push(fractalBolt(origin.x, origin.y, endX, endY, branchLen * 0.18));
+      }
+
+      return branches;
+    };
+
+    const tracePath = (points) => {
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i += 1) {
+        ctx.lineTo(points[i].x, points[i].y);
+      }
+    };
+
+    const drawBoltPath = (points, opacity, distant = false) => {
+      if (points.length < 2 || opacity <= 0.008) return;
+
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalCompositeOperation = 'lighter';
+
+      tracePath(points);
+      ctx.strokeStyle = `rgba(130, 160, 198, ${opacity * (distant ? 0.1 : 0.16)})`;
+      ctx.lineWidth = distant ? 1.2 : 1.8;
+      ctx.shadowBlur = distant ? 8 : 14;
+      ctx.shadowColor = `rgba(170, 195, 225, ${opacity * 0.22})`;
+      ctx.stroke();
+
+      tracePath(points);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = `rgba(228, 236, 246, ${opacity * (distant ? 0.28 : 0.42)})`;
+      ctx.lineWidth = distant ? 0.35 : 0.5;
+      ctx.stroke();
+
+      tracePath(points);
+      ctx.strokeStyle = `rgba(250, 252, 255, ${opacity * (distant ? 0.45 : 0.72)})`;
+      ctx.lineWidth = 0.25;
+      ctx.stroke();
+
+      ctx.restore();
+    };
+
+    const flickerIntensity = (progress) => {
+      if (progress < 0.08) return progress / 0.08;
+      return Math.exp(-(progress - 0.08) * 5.2);
+    };
+
+    const render = (timestamp) => {
+      const delta = lastFrame ? (timestamp - lastFrame) / 16.67 : 1;
+      lastFrame = timestamp;
+      ctx.clearRect(0, 0, width, height);
+
+      activeBolts = activeBolts.filter((bolt) => {
+        const flicker = bolt.flickers[bolt.flickerIndex];
+        if (!flicker) return false;
+
+        flicker.age += delta;
+
+        if (flicker.age >= flicker.duration) {
+          bolt.flickerIndex += 1;
+          if (bolt.flickerIndex >= bolt.flickers.length) return false;
+          return true;
+        }
+
+        const progress = flicker.age / flicker.duration;
+        const pulse = flicker.peak * flickerIntensity(progress);
+        const opacity = Math.max(0, pulse * bolt.intensity * (bolt.distant ? 0.42 : 0.78));
+
+        drawBoltPath(bolt.main, opacity, bolt.distant);
+        bolt.branches.forEach((branch) => {
+          drawBoltPath(branch, opacity * 0.5, true);
+        });
+
+        return true;
+      });
+
+      if (isRunning) {
+        rafId = requestAnimationFrame(render);
+      }
+    };
+
+    const illuminateSky = (x, y, strength, fadeMs) => {
+      const xPct = `${(x / width) * 100}%`;
+      const yPct = `${(y / height) * 100}%`;
+      const core = 0.03 + strength * 0.07;
+      const peakOpacity = 0.08 + strength * 0.16;
+
+      flash.style.setProperty('--flash-x', xPct);
+      flash.style.setProperty('--flash-y', yPct);
+      flash.style.setProperty('--flash-core', String(core));
+      flash.style.setProperty('--flash-opacity', String(peakOpacity));
+      flash.style.setProperty('--flash-fade', `${fadeMs}ms`);
+
+      haze.style.setProperty('--haze-x', xPct);
+      haze.style.setProperty('--haze-y', yPct);
+      haze.style.setProperty('--haze-core', String(core * 1.15));
+      haze.style.setProperty('--haze-fade', `${fadeMs + 400}ms`);
+
+      flash.classList.remove('is-fading');
+      flash.classList.add('is-flashing');
+      haze.classList.add('is-lit');
+
+      clearTimeout(fadeTimer);
+      clearTimeout(hazeTimer);
+
+      fadeTimer = setTimeout(() => {
+        flash.classList.remove('is-flashing');
+        flash.classList.add('is-fading');
+      }, 14 + Math.random() * 22);
+
+      hazeTimer = setTimeout(() => {
+        haze.classList.remove('is-lit');
+      }, fadeMs * 0.9);
+    };
+
+    const createFlickers = (intensity) => {
+      const count = intensity > 0.75 && Math.random() > 0.55 ? 3 : intensity > 0.45 ? 2 : 1;
+      const flickers = [];
+
+      for (let i = 0; i < count; i += 1) {
+        flickers.push({
+          peak: randomBetween(0.55, 1) * intensity,
+          duration: randomBetween(0.8, 1.8),
+          age: i === 0 ? 0 : randomBetween(0.4, 1.1)
+        });
+      }
+
+      return flickers;
+    };
+
+    const strike = () => {
+      if (!section.classList.contains('is-storm-active')) return;
+
+      const roll = Math.random();
+      const startX = randomBetween(width * 0.1, width * 0.9);
+      const cloudY = randomBetween(-height * 0.14, height * 0.02);
+      const skyX = startX + randomBetween(-width * 0.04, width * 0.04);
+      const skyY = cloudY + height * 0.1;
+
+      // Mostly cloud illumination — like real distant storms
+      if (roll < 0.55) {
+        illuminateSky(skyX, skyY, randomBetween(0.18, 0.42), randomBetween(1200, 2200));
+        return;
+      }
+
+      const distant = roll < 0.82;
+      const intensity = distant ? randomBetween(0.22, 0.48) : randomBetween(0.5, 0.82);
+      const endY = randomBetween(height * 0.28, distant ? height * 0.62 : height * 0.82);
+      const spread = distant ? randomBetween(22, 40) : randomBetween(34, 62);
+      const main = buildBolt(startX, cloudY, endY, spread);
+      const branches = buildBranches(main, intensity);
+
+      activeBolts.push({
+        main,
+        branches,
+        intensity,
+        distant,
+        flickers: createFlickers(intensity),
+        flickerIndex: 0
+      });
+
+      illuminateSky(
+        skyX,
+        skyY,
+        distant ? intensity * 0.42 : intensity * 0.68,
+        distant ? randomBetween(1000, 1700) : randomBetween(700, 1200)
+      );
+    };
+
+    const scheduleStrike = () => {
+      clearTimeout(strikeTimer);
+      if (!section.classList.contains('is-storm-active')) return;
+
+      const pause = Math.random() > 0.84
+        ? randomBetween(8000, 14000)
+        : randomBetween(4200, 9000);
+
+      strikeTimer = setTimeout(() => {
+        strike();
+        if (Math.random() > 0.88) {
+          setTimeout(strike, randomBetween(90, 220));
+        }
+        scheduleStrike();
+      }, pause);
+    };
+
+    const start = () => {
+      if (isRunning) return;
+      isRunning = true;
+      lastFrame = 0;
+      resize();
+      rafId = requestAnimationFrame(render);
+      scheduleStrike();
+      setTimeout(strike, randomBetween(3000, 5500));
+    };
+
+    const stop = () => {
+      isRunning = false;
+      clearTimeout(strikeTimer);
+      clearTimeout(fadeTimer);
+      clearTimeout(hazeTimer);
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+      lastFrame = 0;
+      activeBolts = [];
+      ctx.clearRect(0, 0, width, height);
+      flash.classList.remove('is-flashing', 'is-fading');
+      haze.classList.remove('is-lit');
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    const observer = new MutationObserver(() => {
+      if (section.classList.contains('is-storm-active')) {
+        start();
+      } else {
+        stop();
+      }
+    });
+
+    observer.observe(section, { attributes: true, attributeFilter: ['class'] });
+
+    if (section.classList.contains('is-storm-active')) {
+      start();
+    }
+
+    return { start, stop, resize };
+  }
+
+  // ==========================================
   // 13. OUR SERVICES PINNED TRANSITION & 3D ROTATION
   // ==========================================
   const servicesSection = document.querySelector('.services-section');
+  const storiesSection = document.querySelector('.stories-section');
+  const shutterWipe = document.querySelector('.shutter-wipe');
+
   if (servicesSection) {
+    initServicesLightning(servicesSection);
+
+    const updateShutterReveal = (progress) => {
+      const total = servicesTl.duration();
+      const t = progress * total;
+
+      const shutterCloseStart = 2.0;
+      const shutterFullyClosed = 3.18;
+      const shutterOpenStart = 3.4;
+      const shutterOpenEnd = 4.58;
+
+      const shuttersActive = t >= shutterCloseStart && t < shutterOpenEnd;
+
+      if (shutterWipe) {
+        shutterWipe.classList.toggle('is-active', shuttersActive);
+      }
+
+      if (t < shutterCloseStart) {
+        // 1) Logo + box only
+        servicesSection.classList.remove('is-shutter-hidden');
+        gsap.set(servicesSection, { autoAlpha: 1 });
+        storiesSection?.classList.remove('is-behind-shutter');
+      } else if (t < shutterFullyClosed) {
+        // 2) White lines closing — logo still visible underneath
+        servicesSection.classList.remove('is-shutter-hidden');
+        gsap.set(servicesSection, { autoAlpha: 1 });
+        storiesSection?.classList.remove('is-behind-shutter');
+      } else if (t < shutterOpenEnd) {
+        // 3) Fully covered, then lines move — client stories behind shutters
+        servicesSection.classList.add('is-shutter-hidden');
+        gsap.set(servicesSection, { autoAlpha: 0 });
+        storiesSection?.classList.add('is-behind-shutter');
+        document.body.classList.remove('light-theme-active');
+      } else {
+        // 4) Transition done
+        servicesSection.classList.add('is-shutter-hidden');
+        storiesSection?.classList.remove('is-behind-shutter');
+        if (shutterWipe) shutterWipe.classList.remove('is-active');
+      }
+    };
+
     const servicesTl = gsap.timeline({
       scrollTrigger: {
         trigger: '.services-section',
         pin: true,
         start: 'top top',
         end: '+=250%', // scroll duration
-        scrub: 1.2,
+        scrub: 2,
         invalidateOnRefresh: true,
         onUpdate: (self) => {
+          const t = self.progress * servicesTl.duration();
+          const shutterRevealPhase = t >= 3.18;
+
           // Dynamic theme toggle on scroll
-          if (self.progress > 0.4) {
+          if (shutterRevealPhase) {
+            document.body.classList.remove('light-theme-active');
+          } else if (self.progress > 0.4) {
             document.body.classList.remove('light-theme-active');
           } else {
-            // Restore light theme when scrolling back up to Selected Work
             document.body.classList.add('light-theme-active');
+          }
+
+          if (self.progress > 0.18 && self.progress < 0.72) {
+            servicesSection.classList.add('is-storm-active');
+          } else {
+            servicesSection.classList.remove('is-storm-active');
+          }
+
+          updateShutterReveal(self.progress);
+        },
+        onLeave: () => {
+          if (storiesSection) {
+            storiesSection.classList.remove('is-behind-shutter');
+          }
+          if (shutterWipe) {
+            shutterWipe.classList.remove('is-active');
+          }
+          servicesSection.classList.remove('is-shutter-hidden');
+        },
+        onEnterBack: () => {
+          servicesSection.classList.remove('is-shutter-hidden');
+          gsap.set(servicesSection, { autoAlpha: 1 });
+          if (storiesSection) {
+            storiesSection.classList.remove('is-behind-shutter');
           }
         }
       }
@@ -1702,6 +2074,12 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 1,
       duration: 1
     }, 0);
+
+    // Fade in lightning storm behind the slab
+    servicesTl.to('.services-lightning', {
+      opacity: 1,
+      duration: 1.1
+    }, 0.25);
 
     // Fade and scale poster state
     servicesTl.to('.services-poster', {
@@ -1747,29 +2125,32 @@ document.addEventListener('DOMContentLoaded', () => {
       duration: 0.8
     }, 1.6);
 
+    // Soften logo scene before shutters sweep in
+    servicesTl.to('.services-centerpiece', {
+      opacity: 0.35,
+      scale: 0.96,
+      ease: 'power2.inOut',
+      duration: 0.6
+    }, 1.85);
+
     // ==========================================
     // 14. VENETIAN SHUTTER TRANSITION WIPE
     // ==========================================
-    // Slide transition bars in (covering viewport)
+    // Slide transition bars in (covering viewport) — logo/box still visible until fully covered
     servicesTl.to('.shutter-bar', {
       scaleX: 1,
-      stagger: 0.08,
-      ease: 'power1.inOut',
-      duration: 0.8
+      stagger: 0.06,
+      ease: 'power3.inOut',
+      duration: 1
     }, 2.0);
 
-    // Toggle body theme to light while covered
-    servicesTl.call(() => {
-      document.body.classList.add('light-theme-active');
-    }, null, 2.8);
-
-    // Slide bars out to reveal next section
+    // Mount client stories behind shutters, then slide bars out left/right
     servicesTl.to('.shutter-bar', {
       scaleX: 0,
-      stagger: 0.08,
-      ease: 'power1.inOut',
-      duration: 0.8
-    }, 2.8);
+      stagger: 0.06,
+      ease: 'power3.inOut',
+      duration: 1
+    }, 3.4);
   }
 
   // ==========================================
@@ -1779,63 +2160,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const testimonialCards = gsap.utils.toArray('.testimonial-card');
   testimonialCards.forEach((card) => {
     gsap.fromTo(card,
-      { opacity: 0, y: 60 },
+      { opacity: 0, y: 50 },
       {
         opacity: 1,
         y: 0,
-        duration: 1.2,
+        ease: 'power2.out',
         scrollTrigger: {
           trigger: card,
-          start: 'top 90%',
-          end: 'top 65%',
-          scrub: true
+          start: 'top 88%',
+          end: 'top 62%',
+          scrub: 1.6
         }
       }
     );
   });
-
-  // Masonry Dribbble cards scroll parallax translations
-  const explorationsCollage = document.querySelector('.explorations-collage');
-  if (explorationsCollage) {
-    gsap.fromTo('.card-sketches', 
-      { y: 50 }, 
-      {
-        y: -50,
-        scrollTrigger: {
-          trigger: '.explorations-collage',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      }
-    );
-
-    gsap.fromTo('.card-mockup', 
-      { y: 100 }, 
-      {
-        y: -20,
-        scrollTrigger: {
-          trigger: '.explorations-collage',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      }
-    );
-
-    gsap.fromTo('.card-swank', 
-      { y: 30 }, 
-      {
-        y: -70,
-        scrollTrigger: {
-          trigger: '.explorations-collage',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      }
-    );
-  }
 
   // ==========================================
   // 16. INTERACTIVE FOOTER MUSIC LINES
