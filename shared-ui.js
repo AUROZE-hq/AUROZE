@@ -1,3 +1,32 @@
+const IS_MOBILE_PERF = window.innerWidth <= 768;
+
+function debounce(fn, wait = 150) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), wait);
+  };
+}
+
+function observeVisibility(el, onVisible, onHidden, rootMargin = '80px') {
+  if (!el || typeof IntersectionObserver === 'undefined') {
+    onVisible();
+    return () => {};
+  }
+  let visible = false;
+  const observer = new IntersectionObserver(([entry]) => {
+    if (entry.isIntersecting && !visible) {
+      visible = true;
+      onVisible();
+    } else if (!entry.isIntersecting && visible) {
+      visible = false;
+      onHidden();
+    }
+  }, { rootMargin });
+  observer.observe(el);
+  return () => observer.disconnect();
+}
+
 export function initSharedUI() {
   const menuToggleBtn = document.querySelector('.menu-toggle');
   const menuCloseBtn = document.querySelector('.menu-close');
@@ -55,7 +84,6 @@ export function initSharedUI() {
   initBackgroundCanvas();
   initLogoSparks();
   initFooterCanvas();
-  initSoundToggle();
 }
 
 function initBackgroundCanvas() {
@@ -73,17 +101,19 @@ function initBackgroundCanvas() {
   let targetMouseX = 0;
   let targetMouseY = 0;
 
-  window.addEventListener('resize', () => {
+  const resizeBg = debounce(() => {
     width = bgCanvas.width = window.innerWidth;
     height = bgCanvas.height = window.innerHeight;
   });
+  window.addEventListener('resize', resizeBg);
 
   window.addEventListener('mousemove', (e) => {
     targetMouseX = (e.clientX / window.innerWidth) - 0.5;
     targetMouseY = (e.clientY / window.innerHeight) - 0.5;
   }, { passive: true });
 
-  const stars = Array.from({ length: 40 }, () => ({
+  const starCount = IS_MOBILE_PERF ? 14 : 40;
+  const stars = Array.from({ length: starCount }, () => ({
     x: Math.random() * 100,
     y: Math.random() * 100,
     size: Math.random() * 8 + 6,
@@ -99,7 +129,35 @@ function initBackgroundCanvas() {
     { startX: 0.4, startY: -0.5, endX: 1.4, endY: 0.5, parallax: 80 }
   ];
 
+  let bgRafId = null;
+  let bgActive = true;
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && bgActive && !bgRafId) drawBackground();
+  });
+
+  observeVisibility(
+    bgCanvas,
+    () => {
+      bgActive = true;
+      if (!document.hidden && !bgRafId) drawBackground();
+    },
+    () => {
+      bgActive = false;
+      if (bgRafId) {
+        cancelAnimationFrame(bgRafId);
+        bgRafId = null;
+      }
+    },
+    '120px'
+  );
+
   const drawBackground = () => {
+    if (!bgActive || document.hidden) {
+      bgRafId = null;
+      return;
+    }
+
     ctx.clearRect(0, 0, width, height);
     mouseX += (targetMouseX - mouseX) * 0.08;
     mouseY += (targetMouseY - mouseY) * 0.08;
@@ -131,7 +189,7 @@ function initBackgroundCanvas() {
       ctx.stroke();
     });
 
-    requestAnimationFrame(drawBackground);
+    bgRafId = requestAnimationFrame(drawBackground);
   };
 
   drawBackground();
@@ -166,7 +224,14 @@ function initLogoSparks() {
     });
   };
 
+  let sparksRafId = null;
+
   const updateLogoSparks = () => {
+    if (logoSparks.length === 0) {
+      sparksRafId = null;
+      return;
+    }
+
     sparksCtx.clearRect(0, 0, 100, 100);
     for (let i = logoSparks.length - 1; i >= 0; i--) {
       const spark = logoSparks[i];
@@ -184,10 +249,12 @@ function initLogoSparks() {
         sparksCtx.fill();
       }
     }
-    requestAnimationFrame(updateLogoSparks);
+    sparksRafId = requestAnimationFrame(updateLogoSparks);
   };
 
-  updateLogoSparks();
+  const queueSparkUpdate = () => {
+    if (!sparksRafId) sparksRafId = requestAnimationFrame(updateLogoSparks);
+  };
 
   logoContainer.addEventListener('mousemove', (e) => {
     const rect = sparksCanvas.getBoundingClientRect();
@@ -195,31 +262,14 @@ function initLogoSparks() {
     const mY = ((e.clientY - rect.top) / rect.height) * 100;
     addLogoSpark(mX, mY);
     addLogoSpark(mX, mY);
+    queueSparkUpdate();
   });
 
   logoContainer.addEventListener('mouseenter', () => {
     for (let i = 0; i < 12; i++) addLogoSpark(50, 50);
+    queueSparkUpdate();
   });
 }
-
-function initSoundToggle() {
-  const soundToggleBtn = document.querySelector('.sound-toggle');
-  const soundOnIcon = document.querySelector('.sound-on');
-  const soundOffIcon = document.querySelector('.sound-off');
-  if (!soundToggleBtn) return;
-
-  let isSoundOn = false;
-
-  soundToggleBtn.addEventListener('click', () => {
-    isSoundOn = !isSoundOn;
-    soundOnIcon?.classList.toggle('hidden', !isSoundOn);
-    soundOffIcon?.classList.toggle('hidden', isSoundOn);
-    soundToggleBtn.style.borderColor = isSoundOn
-      ? 'rgba(255, 95, 0, 0.85)'
-      : 'rgba(255, 255, 255, 0.18)';
-  });
-}
-
 function initFooterCanvas() {
   const canvas = document.getElementById('footer-lines-canvas');
   if (!canvas) return;
@@ -232,6 +282,8 @@ function initFooterCanvas() {
   const offscreen = document.createElement('canvas');
   const oCtx = offscreen.getContext('2d');
 
+  let cachedPixels = null;
+
   const renderTextToOffscreen = () => {
     offscreen.width = width;
     offscreen.height = height;
@@ -243,15 +295,17 @@ function initFooterCanvas() {
     oCtx.textAlign = 'center';
     oCtx.textBaseline = 'middle';
     oCtx.fillText('AUROZE', width / 2, height / 2);
+    cachedPixels = oCtx.getImageData(0, 0, width, height).data;
   };
 
   renderTextToOffscreen();
 
-  window.addEventListener('resize', () => {
+  const resizeFooter = debounce(() => {
     width = canvas.width = canvas.offsetWidth;
     height = canvas.height = canvas.offsetHeight;
     renderTextToOffscreen();
   });
+  window.addEventListener('resize', resizeFooter);
 
   let mouseX = -1000;
   let mouseY = -1000;
@@ -268,14 +322,21 @@ function initFooterCanvas() {
     mouseY = -1000;
   });
 
+  let footerRafId = null;
+  let footerActive = false;
+
   const drawScanlines = () => {
+    if (!footerActive || document.hidden || !cachedPixels) {
+      footerRafId = null;
+      return;
+    }
+
     ctx.fillStyle = '#050505';
     ctx.fillRect(0, 0, width, height);
 
-    const imgData = oCtx.getImageData(0, 0, width, height);
-    const pixels = imgData.data;
-    const lineGap = isMobile ? 8 : 6;
-    const segmentLen = 4;
+    const pixels = cachedPixels;
+    const lineGap = isMobile ? 10 : 6;
+    const segmentLen = isMobile ? 6 : 4;
 
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.lineWidth = 1;
@@ -321,8 +382,26 @@ function initFooterCanvas() {
       }
     }
 
-    requestAnimationFrame(drawScanlines);
+    footerRafId = requestAnimationFrame(drawScanlines);
   };
 
-  drawScanlines();
+  observeVisibility(
+    canvas,
+    () => {
+      footerActive = true;
+      if (!document.hidden && !footerRafId) drawScanlines();
+    },
+    () => {
+      footerActive = false;
+      if (footerRafId) {
+        cancelAnimationFrame(footerRafId);
+        footerRafId = null;
+      }
+    },
+    '100px'
+  );
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && footerActive && !footerRafId) drawScanlines();
+  });
 }

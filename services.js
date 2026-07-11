@@ -22,14 +22,14 @@ const SERVICE_ICONS = {
   automation: '⚡'
 };
 
-const PROCESS_ICONS = {
-  discovery: '🔍',
-  planning: '📋',
-  design: '✏️',
-  dev: '⚙️',
-  testing: '✓',
-  launch: '🚀',
-  growth: '📈'
+const PROCESS_SVGS = {
+  discovery: `<svg class="svc-process-svg" viewBox="0 0 24 24" fill="none"><circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M15.5 15.5L20 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  planning: `<svg class="svc-process-svg" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  design: `<svg class="svc-process-svg" viewBox="0 0 24 24" fill="none"><path d="M4 20l4-12 6 6 10-10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="6" r="1.75" fill="currentColor"/></svg>`,
+  dev: `<svg class="svc-process-svg" viewBox="0 0 24 24" fill="none"><path d="M8 9l-3 3 3 3M16 9l3 3-3 3M14 7l-4 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  testing: `<svg class="svc-process-svg" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  launch: `<svg class="svc-process-svg" viewBox="0 0 24 24" fill="none"><path d="M12 3l1.8 6.2H19l-5.2 9.8L12 13H7l5-10z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9.5 10.5L6 12M14.5 10.5L18 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  growth: `<svg class="svc-process-svg" viewBox="0 0 24 24" fill="none"><path d="M4 18h16M6 16l4-5 4 3 5-8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
 };
 
 const BENTO_ICONS = {
@@ -45,6 +45,7 @@ const BENTO_ICONS = {
 
 document.addEventListener('DOMContentLoaded', () => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IS_MOBILE_PERF = window.innerWidth <= 768;
 
   initSharedUI();
   renderContent();
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!reducedMotion) {
     gsap.registerPlugin(ScrollTrigger);
     gsap.config({ force3D: true });
-    gsap.ticker.lagSmoothing(600, 40);
+    gsap.ticker.lagSmoothing(IS_MOBILE_PERF ? 1200 : 600, IS_MOBILE_PERF ? 80 : 40);
     initRevealAnimations();
     initCtaParticles();
     initServiceCardSpotlight();
@@ -107,7 +108,7 @@ function renderProcess() {
   mount.innerHTML = PROCESS_STEPS.map((step) => `
     <div class="svc-process-step" data-reveal>
       <div class="svc-process-num">${step.num}</div>
-      <div class="svc-process-icon" aria-hidden="true">${PROCESS_ICONS[step.icon] || '◈'}</div>
+      <div class="svc-process-icon" aria-hidden="true">${PROCESS_SVGS[step.icon] || PROCESS_SVGS.discovery}</div>
       <h3 class="svc-process-title">${step.title}</h3>
       <p class="svc-process-desc">${step.desc}</p>
     </div>
@@ -175,8 +176,7 @@ function renderTestimonials() {
       <div class="svc-testimonial-author">
         <div class="svc-testimonial-avatar">${t.avatar}</div>
         <div>
-          <div class="svc-testimonial-name">${t.name}</div>
-          <div class="svc-testimonial-role">${t.role}, ${t.company}</div>
+          <div class="svc-testimonial-name">${t.team}</div>
         </div>
       </div>
     </div>
@@ -358,7 +358,8 @@ function initMagneticButtons() {
 }
 
 function initRevealAnimations() {
-  const smoothScrub = (v) => +(v * 1.2).toFixed(2);
+  const IS_MOBILE_PERF = window.innerWidth <= 768;
+  const smoothScrub = (v) => +(v * (IS_MOBILE_PERF ? 1.38 : 1.2)).toFixed(2);
 
   gsap.utils.toArray('[data-reveal]').forEach((el) => {
     gsap.fromTo(el,
@@ -407,12 +408,15 @@ function initCtaParticles() {
 
   const ctx = canvas.getContext('2d');
   let particles = [];
+  let rafId = null;
+  let active = false;
+  const particleCount = window.innerWidth <= 768 ? 14 : 30;
 
   const resize = () => {
     const rect = section.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
-    particles = Array.from({ length: 30 }, () => ({
+    particles = Array.from({ length: particleCount }, () => ({
       x: Math.random() * rect.width,
       y: Math.random() * rect.height,
       r: Math.random() * 1.5 + 0.5,
@@ -421,10 +425,19 @@ function initCtaParticles() {
   };
 
   resize();
-  window.addEventListener('resize', resize);
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 150);
+  });
 
   let tick = 0;
   const draw = () => {
+    if (!active || document.hidden) {
+      rafId = null;
+      return;
+    }
+
     tick += 0.02;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach((p) => {
@@ -434,9 +447,27 @@ function initCtaParticles() {
       ctx.fillStyle = `rgba(255, 95, 0, ${0.15 + Math.sin(tick + p.phase) * 0.1})`;
       ctx.fill();
     });
-    requestAnimationFrame(draw);
+    rafId = requestAnimationFrame(draw);
   };
-  draw();
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const observer = new IntersectionObserver(([entry]) => {
+      active = entry.isIntersecting;
+      if (active && !document.hidden && !rafId) draw();
+      if (!active && rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    }, { rootMargin: '60px' });
+    observer.observe(section);
+  } else {
+    active = true;
+    draw();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && active && !rafId) draw();
+  });
 }
 
 function initServiceCardSpotlight() {

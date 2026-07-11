@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+  <title>Projects | Auroze</title>
+  <meta name="description"
+    content="Explore Auroze projects including websites, mobile applications, enterprise software, POS systems and innovative digital products.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Outfit:wght@300;400;500;700;800&family=Great+Vibes&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="projects.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+</head>
+
+<body class="projects-page">
+
+  <div class="prj-scroll-progress" aria-hidden="true">
+    <div class="prj-scroll-progress-bar"></div>
+  </div>
+
+  <div class="prj-cursor-glow" aria-hidden="true"></div>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <header class="top-bar prj-top-bar">
+    <div class="top-bar-left">
+      <a href="index.html" class="logo" aria-label="Auroze Home">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="silver-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c0c0c0" />
+                <stop offset="25%" stop-color="#ffffff" />
+                <stop offset="50%" stop-color="#a8a8a8" />
+                <stop offset="75%" stop-color="#e8e8e8" />
+                <stop offset="100%" stop-color="#c0c0c0" />
+              </linearGradient>
+              <clipPath id="logo-clip-hdr">
+                <path
+                  d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+                  fill-rule="evenodd" />
+              </clipPath>
+              <linearGradient id="shine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.75)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+              fill="url(#silver-grad)" fill-rule="evenodd" />
+            <g clip-path="url(#logo-clip-hdr)">
+              <rect class="shine-bar" x="-600" y="-100" width="500" height="1200" fill="url(#shine-grad)" />
+            </g>
+          </svg>
+          <canvas id="logo-sparks-canvas"></canvas>
+        </div>
+        <span class="wordmark">AUROZE<span class="registered">®</span></span>
+      </a>
+    </div>
+
+    <nav class="top-bar-center top-bar-nav" aria-label="Primary navigation">
+      <a href="projects.html" class="top-nav-link is-active">WORK</a>
+      <a href="about.html" class="top-nav-link">ABOUT</a>
+      <a href="services.html" class="top-nav-link">SERVICES</a>
+    </nav>
+
+    <div class="top-bar-right">
+      <a href="contact.html?from=projects&scroll=form" class="cta-talk prj-cta-header">START YOUR PROJECT</a>
+
+      <button class="menu-toggle" aria-label="Open menu">
+        <span>MENU</span>
+        <div class="hamburger">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <main class="prj-main">
+
+    <!-- HERO -->
+    <section class="prj-hero" id="prj-hero">
+      <canvas class="prj-hero-particles" aria-hidden="true"></canvas>
+      <div class="prj-hero-grid" aria-hidden="true"></div>
+      <div class="prj-hero-glow" aria-hidden="true"></div>
+      <div class="prj-container prj-hero-inner">
+        <div class="prj-hero-content" data-reveal>
+          <p class="prj-eyebrow">AUROZE PORTFOLIO</p>
+          <h1 class="prj-hero-title">Our Work</h1>
+          <p class="prj-hero-subtitle">Building products, systems and digital experiences that solve real business
+            problems.</p>
+          <p class="prj-hero-desc">From startups to enterprise solutions, Auroze creates scalable software, mobile
+            applications, POS systems, websites and digital products used across multiple industries.</p>
+          <div class="prj-hero-actions">
+            <a href="#prj-featured" class="cta-project prj-btn-magnetic" data-magnetic>
+              <span class="cta-text">EXPLORE PROJECTS</span>
+              <span class="cta-arrow">→</span>
+            </a>
+            <a href="contact.html?from=projects&scroll=form" class="prj-btn-secondary prj-btn-magnetic" data-magnetic>
+              <span>Start Your Project</span>
+              <span class="prj-btn-icon">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FILTER -->
+    <div class="prj-filter-wrap">
+      <div class="prj-container">
+        <nav class="prj-filter" id="prj-filter-mount" aria-label="Filter projects"></nav>
+      </div>
+    </div>
+
+    <!-- FEATURED -->
+    <section class="prj-section" id="prj-featured" data-prj-section="featured websites mobile-apps">
+      <div class="prj-container">
+        <div class="prj-section-head" data-reveal>
+          <p class="prj-eyebrow">PORTFOLIO</p>
+          <h2 class="prj-section-title">Featured Projects</h2>
+        </div>
+        <div id="prj-featured-mount"></div>
+      </div>
+    </section>
+
+    <!-- UPCOMING PRODUCTS -->
+    <section class="prj-section" id="prj-upcoming" data-prj-section="products upcoming">
+      <div class="prj-container">
+        <div class="prj-section-head" data-reveal>
+          <p class="prj-eyebrow">INNOVATION</p>
+          <h2 class="prj-section-title">Building Tomorrow's Products</h2>
+        </div>
+        <div class="prj-products-grid" id="prj-upcoming-mount"></div>
+      </div>
+    </section>
+
+    <!-- ENTERPRISE -->
+    <section class="prj-section" id="prj-enterprise" data-prj-section="enterprise-systems">
+      <div class="prj-container">
+        <div class="prj-section-head" data-reveal>
+          <p class="prj-eyebrow">ENTERPRISE</p>
+          <h2 class="prj-section-title">Business Systems</h2>
+        </div>
+        <div class="prj-enterprise-list" id="prj-enterprise-mount"></div>
+      </div>
+    </section>
+
+    <!-- POS -->
+    <section class="prj-section" id="prj-pos" data-prj-section="pos-systems">
+      <div class="prj-container">
+        <div class="prj-section-head" data-reveal>
+          <p class="prj-eyebrow">RETAIL &amp; HOSPITALITY</p>
+          <h2 class="prj-section-title">Point of Sale Systems</h2>
+        </div>
+        <div id="prj-pos-mount"></div>
+      </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section class="prj-section prj-process-section" id="prj-process">
+      <div class="prj-container">
+        <div class="prj-section-head prj-section-head--center" data-reveal>
+          <p class="prj-eyebrow">HOW WE BUILD</p>
+          <h2 class="prj-section-title">Our Development Process</h2>
+        </div>
+        <div class="prj-process" id="prj-process-mount"></div>
+      </div>
+    </section>
+
+    <!-- TECH -->
+    <section class="prj-section prj-tech-section" id="prj-tech">
+      <div class="prj-section-head prj-section-head--center" data-reveal>
+        <p class="prj-eyebrow">STACK</p>
+        <h2 class="prj-section-title">Technologies</h2>
+      </div>
+      <div class="prj-marquee-wrap">
+        <div class="prj-marquee" id="prj-marquee-mount"></div>
+      </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section class="prj-section" id="prj-timeline">
+      <div class="prj-container">
+        <div class="prj-section-head prj-section-head--center" data-reveal>
+          <p class="prj-eyebrow">GROWTH</p>
+          <h2 class="prj-section-title">Project Timeline</h2>
+        </div>
+        <div class="prj-timeline" id="prj-timeline-mount"></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="prj-final-cta" id="prj-cta">
+      <canvas class="prj-cta-particles" aria-hidden="true"></canvas>
+      <div class="prj-cta-glow" aria-hidden="true"></div>
+      <div class="prj-container prj-cta-inner" data-reveal>
+        <h2 class="prj-cta-title">Have an idea?</h2>
+        <p class="prj-cta-desc">Let's build your next digital product.</p>
+        <div class="prj-cta-actions">
+          <a href="contact.html?from=projects&scroll=form" class="cta-project prj-btn-magnetic" data-magnetic>
+            <span class="cta-text">START YOUR PROJECT</span>
+            <span class="cta-arrow">→</span>
+          </a>
+          <a href="mailto:info@auroze.com" class="prj-btn-secondary prj-btn-magnetic" data-magnetic>
+            <span>Contact Us</span>
+            <span class="prj-btn-icon">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer-section" id="contact">
+    <div class="footer-smoke-overlay"></div>
+    <div class="footer-container">
+      <div class="footer-top-row">
+        <h2 class="footer-headline">Ready to build<br>something bold?</h2>
+        <a href="mailto:info@auroze.com" class="cta-collab">
+          <span class="cta-text">START A COLLABORATION</span>
+          <span class="cta-arrow">→</span>
+          <span class="underline-line"></span>
+        </a>
+      </div>
+      <div class="footer-middle-row">
+        <div class="footer-left-col">
+          <div class="footer-copyright">© AUROZE® 2026</div>
+          <div class="footer-instruction">HOVER THE LINES.</div>
+        </div>
+        <div class="footer-right-col">
+          <div class="footer-info-col">
+            <div class="info-label">BUSINESS ENQUIRY</div>
+            <div class="info-val"><span class="prefix">E.</span> info@auroze.com</div>
+            <div class="info-val"><span class="prefix">P.</span> 0762646376</div>
+          </div>
+          <div class="footer-info-col">
+            <div class="info-label">SOCIAL</div>
+            <div class="social-grid">
+              <a href="https://www.linkedin.com/in/krushanth19/?skipRedirect=true" class="social-link" target="_blank" rel="noopener noreferrer">
+                <svg class="social-link-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 9h3v10H5V9zm1.5-4a2 2 0 110 4 2 2 0 010-4zM10 9h3v1.4h.05c.55-1 1.8-2.1 3.7-2.1 3.9 0 4.6 2.6 4.6 6v4.7h-3v-4.5c0-1.1 0-2.6-1.6-2.6-1.7 0-1.9 1.3-1.9 2.5v4.6H10V9z" fill="currentColor"/></svg>
+                <span>Linkedin</span>
+              </a>
+              <a href="https://web.facebook.com/profile.php?id=61591792293311" class="social-link" target="_blank" rel="noopener noreferrer">
+                <svg class="social-link-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 8h2.5V5H14c-2.5 0-4 1.5-4 4v2H7v3h2.5v7H14v-7h2.5l.5-3H14V8.6c0-.8.2-1.5 1.5-1.5z" fill="currentColor"/></svg>
+                <span>Facebook</span>
+              </a>
+              <a href="https://www.instagram.com/aurozehq/" class="social-link" target="_blank" rel="noopener noreferrer">
+                <svg class="social-link-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.8" stroke="currentColor" stroke-width="1.6"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor"/></svg>
+                <span>Instagram</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-wordmark-container">
+        <canvas id="footer-lines-canvas"></canvas>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner" id="cookie-banner">
+    <span class="cookie-text">WE USE COOKIES TO ENHANCE YOUR EXPERIENCE.</span>
+    <div class="cookie-actions">
+      <button class="cookie-btn btn-decline" id="cookie-decline">DECLINE</button>
+      <button class="cookie-btn btn-accept" id="cookie-accept">ACCEPT</button>
+    </div>
+  </div>
+
+  <div class="menu-overlay" id="menu-overlay">
+    <div class="overlay-background"></div>
+    <div class="overlay-header">
+      <a href="index.html" class="logo">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z"
+              fill="#d9d9d9" fill-rule="evenodd" />
+          </svg>
+        </div>
+        <span class="wordmark">AUROZE</span>
+      </a>
+      <button class="menu-close" id="menu-close" aria-label="Close menu">
+        <span>CLOSE</span>
+        <div class="close-icon">
+          <span class="cross cross-1"></span>
+          <span class="cross cross-2"></span>
+        </div>
+      </button>
+    </div>
+    <nav class="overlay-nav">
+      <ul>
+        <li><a href="projects.html" class="nav-item is-active" data-bg-img="work"><span class="nav-number">01</span>
+            <span class="nav-label">WORK</span></a></li>
+        <li><a href="about.html" class="nav-item" data-bg-img="about"><span class="nav-number">02</span> <span
+              class="nav-label">ABOUT</span></a></li>
+        <li><a href="services.html" class="nav-item" data-bg-img="services"><span class="nav-number">03</span> <span
+              class="nav-label">SERVICES</span></a></li>
+        <li><a href="contact.html" class="nav-item" data-bg-img="contact"><span class="nav-number">04</span> <span
+              class="nav-label">CONTACT</span></a></li>
+      </ul>
+    </nav>
+    <div class="overlay-footer">
+      <div class="social-links">
+        <a href="https://web.facebook.com/profile.php?id=61591792293311" class="social-item" target="_blank" rel="noopener noreferrer">FACEBOOK</a>
+        <a href="https://www.instagram.com/aurozehq/" class="social-item" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+        <a href="https://www.linkedin.com/in/krushanth19/?skipRedirect=true" class="social-item" target="_blank" rel="noopener noreferrer">LINKEDIN</a>
+      </div>
+      <div class="office-location"><span>CREATIVE OUTPOST — NY / LON / BLR</span></div>
+    </div>
+  </div>
+
+  <script type="module" src="projects.js"></script>
+</body>
+
+</html>

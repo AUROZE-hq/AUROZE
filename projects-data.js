@@ -6,6 +6,9 @@ export const FEATURED_PROJECTS = [
     image: 'assets/images/lovecry.png',
     alt: 'Love Cry NGO website preview',
     type: 'NGO Website',
+    category: 'Website',
+    status: 'live',
+    filters: ['featured', 'websites'],
     technologies: ['Next.js', 'CMS', 'SEO'],
     industry: 'Non-Profit / Healthcare',
     caption: 'NGO in Canada supporting child care and youth mental health through safe, healing spaces.'
@@ -17,6 +20,9 @@ export const FEATURED_PROJECTS = [
     image: 'assets/images/eventix.png',
     alt: 'RSK Eventix ticket booking system preview',
     type: 'Ticket Platform',
+    category: 'Website',
+    status: 'upcoming',
+    filters: ['featured', 'websites', 'upcoming'],
     technologies: ['React', 'Node.js', 'Stripe'],
     industry: 'Events / Entertainment',
     caption: 'Ticket booking system for the UK — launching soon as a product in the coming days.'
@@ -28,6 +34,9 @@ export const FEATURED_PROJECTS = [
     image: 'assets/images/nirohardware.png',
     alt: 'Niro Hardware website preview',
     type: 'E-Commerce Website',
+    category: 'Website',
+    status: 'live',
+    filters: ['featured', 'websites'],
     technologies: ['React', 'Vercel', 'SEO'],
     industry: 'Retail / Hardware',
     caption: 'Hardware retail website in Sri Lanka for effortless product discovery and browsing.'
@@ -137,36 +146,22 @@ export const WHY_AUROZE = [
 
 export const TESTIMONIALS = [
   {
-    quote: 'Auroze redefined our entire digital platform. Their craft and execution brought a level of clarity and scale we didn\'t think was possible.',
-    name: 'Alex Vermeulen',
-    role: 'Design Director',
-    company: 'Metaverse',
+    quote: 'Auroze delivered a compassionate, polished website that truly reflects our mission — giving families and youth a safe digital space to find support.',
+    team: 'Love Cry Team',
     rating: 5,
-    avatar: 'AV'
+    avatar: 'LC'
   },
   {
-    quote: 'Every phase of our partnership was built on trust and a shared standard of craft. The results speak for themselves.',
-    name: 'Sarah Chen',
-    role: 'VP of Product',
-    company: 'Stripe',
+    quote: 'Every phase of our partnership was built on trust and a shared standard of craft. Our ticket platform exceeded what we envisioned.',
+    team: 'RSK Eventix Team',
     rating: 5,
-    avatar: 'SC'
+    avatar: 'RE'
   },
   {
-    quote: 'They designed a system that was built to scale and endure. Working with them was an absolute game changer.',
-    name: 'Marcus Aurelius',
-    role: 'Creative Director',
-    company: 'Monolith',
+    quote: 'They built a clean, responsive platform that connects customers with service providers seamlessly. Working with Auroze was an absolute game changer.',
+    team: 'SoulRoots Team',
     rating: 5,
-    avatar: 'MA'
-  },
-  {
-    quote: 'From strategy to launch, Auroze delivered a product that exceeded expectations and performed from day one.',
-    name: 'Priya Nair',
-    role: 'Founder',
-    company: 'Lumina Health',
-    rating: 5,
-    avatar: 'PN'
+    avatar: 'SR'
   }
 ];
 
@@ -195,4 +190,194 @@ export const FAQ_ITEMS = [
     q: 'Can you automate our business?',
     a: 'We design workflow automations, AI integrations, CRM connections, payment flows, and internal tools tailored to your operations.'
   }
+];
+
+/* ==========================================
+   PROJECTS PAGE DATA
+   ========================================== */
+
+export const PROJECT_FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'featured', label: 'Featured' },
+  { id: 'websites', label: 'Websites' },
+  { id: 'mobile-apps', label: 'Mobile Apps' },
+  { id: 'products', label: 'Products' },
+  { id: 'enterprise-systems', label: 'Enterprise Systems' },
+  { id: 'pos-systems', label: 'POS Systems' },
+  { id: 'upcoming', label: 'Upcoming' }
+];
+
+export const PROJECT_STATUS = {
+  live: { label: 'Live', class: 'is-live' },
+  completed: { label: 'Completed', class: 'is-completed' },
+  upcoming: { label: 'Upcoming', class: 'is-upcoming' },
+  'in-development': { label: 'In Development', class: 'is-dev' },
+  private: { label: 'Private', class: 'is-private' }
+};
+
+export const HERO_FEATURED = [
+  {
+    id: 'soulroots',
+    order: 1,
+    filters: ['featured', 'websites'],
+    title: 'SoulRoots',
+    category: 'Website',
+    status: 'live',
+    image: 'assets/images/soulroots.png',
+    alt: 'SoulRoots home maintenance platform preview',
+    url: 'https://soulroots.info',
+    description: 'A modern home maintenance platform connecting customers with trusted home service providers through a clean, responsive and user-friendly digital experience.',
+    features: ['Responsive Website', 'Booking Experience', 'Modern UI', 'SEO Ready'],
+    technologies: ['Next.js', 'React', 'Tailwind', 'SEO']
+  },
+  {
+    id: 'btexpress',
+    order: 2,
+    filters: ['featured', 'mobile-apps', 'upcoming'],
+    title: 'BTExpress',
+    category: 'Cross Platform',
+    status: 'upcoming',
+    image: 'assets/images/BTtravells.jpeg',
+    alt: 'BTExpress transportation platform preview',
+    url: null,
+    description: 'An upcoming transportation platform including Android, iOS and Web applications designed for modern travel management and booking experiences.',
+    features: ['Android', 'iOS', 'Web'],
+    technologies: ['Flutter', 'React', 'Node.js', 'Firebase']
+  },
+  {
+    id: 'canada-pizza-web',
+    order: 3,
+    filters: ['featured', 'websites', 'upcoming'],
+    title: 'Canada Pizza',
+    category: 'Website',
+    status: 'upcoming',
+    image: 'assets/images/pizza.png',
+    alt: 'Canada Pizza restaurant website preview',
+    url: null,
+    client: 'Canada',
+    description: 'An upcoming restaurant website for a Canadian pizza brand — featuring menu showcase, online ordering and a premium digital brand experience.',
+    features: ['Menu Showcase', 'Online Ordering', 'Modern UI', 'Mobile Ready'],
+    technologies: ['Next.js', 'React', 'Tailwind', 'SEO']
+  }
+];
+
+export const UPCOMING_PRODUCTS = [
+  {
+    id: 'exam-engine',
+    filters: ['products', 'upcoming'],
+    title: 'Exam Engine',
+    category: 'Education Platform',
+    status: 'upcoming',
+    statusNote: 'Launching September',
+    badge: 'Premium Product',
+    image: 'assets/images/exam.png',
+    alt: 'Exam Engine education platform preview',
+    description: 'A comprehensive examination platform designed for schools, universities, teachers and students with support for multiple examination types across five countries.',
+    features: ['Online Exams', 'Question Banks', 'IQ Tests', 'Analytics', 'University Exams', 'Teacher Dashboard', 'Student Portal'],
+    technologies: ['React', 'Node.js', 'MongoDB', 'AWS']
+  },
+  {
+    id: 'filmism',
+    filters: ['products', 'upcoming'],
+    title: 'FILMISM',
+    category: 'Entertainment',
+    status: 'in-development',
+    badge: null,
+    image: 'assets/images/flim.png',
+    alt: 'FILMISM movie discovery platform preview',
+    description: 'A movie information platform providing movie details, discovery tools and entertainment insights with a modern user experience.',
+    features: ['Movie Discovery', 'Details & Reviews', 'Modern UX'],
+    technologies: ['Next.js', 'React', 'TypeScript', 'Tailwind']
+  },
+  {
+    id: 'confidential',
+    filters: ['products', 'upcoming'],
+    title: 'Confidential Product',
+    category: 'Private Project',
+    status: 'private',
+    confidential: true,
+    description: 'Currently under development for strategic reasons. Additional information cannot be publicly disclosed at this stage.',
+    features: [],
+    technologies: []
+  }
+];
+
+export const ENTERPRISE_SYSTEMS = [
+  {
+    id: 'famia',
+    filters: ['enterprise-systems'],
+    title: 'FAMIA System',
+    category: 'Enterprise Platform',
+    status: 'completed',
+    client: 'Canada',
+    description: 'Business management platform developed for a Canadian client to streamline operations and improve workflow efficiency.',
+    features: ['Operations Management', 'Workflow Automation', 'Reporting'],
+    technologies: ['React', 'Node.js', 'PostgreSQL']
+  },
+  {
+    id: 'retail-mgmt',
+    filters: ['enterprise-systems'],
+    title: 'Retail Management System',
+    category: 'Enterprise Platform',
+    status: 'completed',
+    description: 'Custom hardware-integrated inventory and billing solution connecting two physical stores into one centralized management platform.',
+    features: ['Shared Inventory', 'Billing', 'Stock Tracking', 'Sales Reports', 'Customer Management'],
+    technologies: ['React', 'Node.js', 'MongoDB', 'Hardware Integration']
+  },
+  {
+    id: 'advanced-inventory',
+    filters: ['enterprise-systems'],
+    title: 'Advanced Inventory System',
+    category: 'Enterprise Platform',
+    status: 'completed',
+    description: 'Enterprise inventory management platform integrated with specialized hardware for synchronized business operations across multiple locations.',
+    features: ['Multi-location Sync', 'Hardware Integration', 'Real-time Stock'],
+    technologies: ['React', 'Node.js', 'AWS', 'IoT']
+  }
+];
+
+export const POS_SOLUTIONS = [
+  {
+    id: 'canada-pizza',
+    filters: ['pos-systems'],
+    title: 'Canada Pizza System',
+    category: 'Restaurant POS',
+    status: 'completed',
+    client: 'Canada',
+    image: 'assets/images/pizzeria.png',
+    alt: 'Canada Pizza System restaurant POS preview',
+    description: 'Customized restaurant POS solution with inventory management, billing, kitchen workflow and reporting.',
+    features: ['Restaurant POS', 'Retail POS', 'Kitchen Display', 'Billing', 'Analytics', 'Inventory POS'],
+    technologies: ['React', 'Node.js', 'Cloud POS']
+  }
+];
+
+export const POS_TYPES = [
+  'Restaurant POS', 'Retail POS', 'Pizza POS', 'Cloud POS',
+  'Inventory POS', 'Kitchen Display', 'Billing', 'Analytics'
+];
+
+export const PROJECT_DEV_PROCESS = [
+  { title: 'Idea', icon: 'idea' },
+  { title: 'Research', icon: 'research' },
+  { title: 'Design', icon: 'design' },
+  { title: 'Development', icon: 'dev' },
+  { title: 'Testing', icon: 'testing' },
+  { title: 'Launch', icon: 'launch' },
+  { title: 'Support', icon: 'support' }
+];
+
+export const PROJECT_TECH_MARQUEE = [
+  'React', 'Next.js', 'Node', 'Flutter', 'React Native', 'MongoDB', 'Firebase',
+  'AWS', 'Docker', 'OpenAI', 'Stripe', 'TypeScript', 'Tailwind', 'Framer Motion'
+];
+
+export const PROJECT_TIMELINE = [
+  { year: '2022', title: 'Company Started' },
+  { title: 'Client Projects' },
+  { title: 'Systems' },
+  { title: 'Products' },
+  { title: 'International Projects' },
+  { title: 'Upcoming Launches' },
+  { title: 'Future Innovations' }
 ];

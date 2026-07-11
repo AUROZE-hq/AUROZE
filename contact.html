@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/images/logo.png">
+  <link rel="apple-touch-icon" href="assets/images/logo.png">
+  <title>Contact Auroze | Start Your Digital Project</title>
+  <meta name="description"
+    content="Contact Auroze for websites, mobile applications, software systems, POS solutions, automation, digital marketing and custom digital products.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Outfit:wght@300;400;500;700;800&family=Great+Vibes&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="contact.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+
+<body class="contact-page">
+
+  <div class="ct-scroll-progress" aria-hidden="true">
+    <div class="ct-scroll-progress-bar"></div>
+  </div>
+
+  <div class="ct-cursor-glow" aria-hidden="true"></div>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <header class="top-bar ct-top-bar">
+    <div class="top-bar-left">
+      <a href="index.html" class="logo" aria-label="Auroze Home">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="silver-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#c0c0c0" />
+                <stop offset="25%" stop-color="#ffffff" />
+                <stop offset="50%" stop-color="#a8a8a8" />
+                <stop offset="75%" stop-color="#e8e8e8" />
+                <stop offset="100%" stop-color="#c0c0c0" />
+              </linearGradient>
+              <clipPath id="logo-clip-hdr">
+                <path
+                  d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+                  fill-rule="evenodd" />
+              </clipPath>
+              <linearGradient id="shine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+                <stop offset="50%" stop-color="rgba(255,255,255,0.75)" />
+                <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z M 581 546 L 581 548 L 600 548 L 601 549 L 608 549 L 609 548 L 612 548 L 613 549 L 738 549 L 737 546 L 735 544 L 734 541 L 732 539 L 731 536 L 729 534 L 729 533 L 728 532 L 728 531 L 726 529 L 726 528 L 725 527 L 724 524 L 722 522 L 721 519 L 719 517 L 718 514 L 716 512 L 716 511 L 714 508 L 606 508 L 605 509 L 605 510 L 603 512 L 603 513 L 601 515 L 601 516 L 599 518 L 598 521 L 595 524 L 594 527 L 590 532 L 589 535 L 587 537 L 587 538 L 585 540 L 585 541 Z M 540 614 L 540 616 L 543 616 L 544 617 L 550 617 L 551 616 L 563 616 L 564 617 L 567 617 L 568 616 L 569 617 L 778 617 L 777 613 L 775 611 L 773 606 L 771 604 L 770 601 L 768 599 L 767 596 L 765 594 L 764 591 L 762 589 L 761 586 L 759 584 L 755 576 L 603 576 L 602 575 L 565 575 L 563 579 L 560 582 L 558 587 L 555 590 L 554 593 L 550 598 L 546 606 Z"
+              fill="url(#silver-grad)" fill-rule="evenodd" />
+            <g clip-path="url(#logo-clip-hdr)">
+              <rect class="shine-bar" x="-600" y="-100" width="500" height="1200" fill="url(#shine-grad)" />
+            </g>
+          </svg>
+          <canvas id="logo-sparks-canvas"></canvas>
+        </div>
+        <span class="wordmark">AUROZE<span class="registered">®</span></span>
+      </a>
+    </div>
+
+    <nav class="top-bar-center top-bar-nav" aria-label="Primary navigation">
+      <a href="projects.html" class="top-nav-link">WORK</a>
+      <a href="about.html" class="top-nav-link">ABOUT</a>
+      <a href="services.html" class="top-nav-link">SERVICES</a>
+    </nav>
+
+    <div class="top-bar-right">
+      <a href="#contact-form" class="cta-talk ct-cta-header">START YOUR PROJECT</a>
+
+      <button class="menu-toggle" aria-label="Open menu">
+        <span>MENU</span>
+        <div class="hamburger">
+          <span class="bar bar-1"></span>
+          <span class="bar bar-2"></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <main class="ct-main">
+
+    <!-- HERO -->
+    <section class="ct-hero" id="ct-hero">
+      <div class="ct-hero-bg" aria-hidden="true">
+        <div class="ct-hero-gradient"></div>
+        <div class="ct-hero-grid"></div>
+        <canvas class="ct-hero-particles" id="ct-hero-particles"></canvas>
+      </div>
+      <div class="ct-hero-inner">
+        <div class="ct-hero-content" data-reveal>
+          <p class="ct-eyebrow">GET IN TOUCH</p>
+          <h1 class="ct-hero-title">Let's Build Something Amazing Together</h1>
+          <p class="ct-hero-sub">
+            Have an idea, project or business challenge?<br>
+            Let's discuss how Auroze can transform it into a powerful digital solution.
+          </p>
+          <div class="ct-hero-actions">
+            <a href="#contact-form" class="ct-btn-primary ct-btn-magnetic" data-magnetic>Start Your Project</a>
+            <a href="mailto:info@auroze.com" class="ct-btn-secondary ct-btn-magnetic" data-magnetic>Talk With Our Team</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT LAYOUT -->
+    <section class="ct-contact-section" id="contact-form">
+      <div class="ct-container">
+        <div class="ct-contact-grid">
+
+          <!-- LEFT: Information -->
+          <div class="ct-contact-info" data-reveal>
+            <h2 class="ct-info-title">Let's Talk</h2>
+            <p class="ct-info-desc">
+              Whether you need a website, mobile application, software system, POS solution, automation or a complete
+              digital transformation, our team is ready to help.
+            </p>
+
+            <div class="ct-info-cards" id="ct-info-cards-mount"></div>
+
+            <div class="ct-social-block">
+              <p class="ct-social-label">Follow Auroze</p>
+              <div class="ct-social-grid" id="ct-social-mount"></div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Form -->
+          <div class="ct-form-panel" data-reveal>
+            <h2 class="ct-form-title">Project Inquiry</h2>
+            <p class="ct-form-sub">Tell us about your vision — we'll respond within 1–2 business days.</p>
+
+            <div class="ct-form-status ct-form-status--success" id="ct-form-success" role="status" aria-live="polite">
+              Thank you for contacting Auroze. Our team will review your project and get back to you soon.
+            </div>
+            <div class="ct-form-status ct-form-status--error" id="ct-form-error" role="alert" aria-live="assertive"></div>
+
+            <form class="ct-form" id="ct-project-form" novalidate>
+              <div class="ct-honeypot" aria-hidden="true">
+                <label for="ct-website">Website</label>
+                <input type="text" id="ct-website" name="website" tabindex="-1" autocomplete="off">
+              </div>
+
+              <div class="ct-form-row">
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-name">Full Name <span class="ct-required">*</span></label>
+                  <input class="ct-input" type="text" id="ct-name" name="name" required autocomplete="name"
+                    placeholder="Your full name">
+                  <span class="ct-field-error" data-error="name"></span>
+                </div>
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-email">Email Address <span class="ct-required">*</span></label>
+                  <input class="ct-input" type="email" id="ct-email" name="email" required autocomplete="email"
+                    placeholder="you@company.com">
+                  <span class="ct-field-error" data-error="email"></span>
+                </div>
+              </div>
+
+              <div class="ct-form-row">
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-phone">Phone Number</label>
+                  <input class="ct-input" type="tel" id="ct-phone" name="phone" autocomplete="tel"
+                    placeholder="+1 000 000 0000">
+                </div>
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-company">Company / Organization</label>
+                  <input class="ct-input" type="text" id="ct-company" name="company" autocomplete="organization"
+                    placeholder="Your company">
+                </div>
+              </div>
+
+              <div class="ct-field ct-field--full">
+                <label class="ct-label" for="ct-country">Country</label>
+                <input class="ct-input" type="text" id="ct-country" name="country" autocomplete="country-name"
+                  placeholder="Your country">
+              </div>
+
+              <div class="ct-form-row">
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-project-type">Project Type <span class="ct-required">*</span></label>
+                  <select class="ct-select" id="ct-project-type" name="project_type" required>
+                    <option value="">Select project type</option>
+                  </select>
+                  <span class="ct-field-error" data-error="project_type"></span>
+                </div>
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-budget">Budget Range</label>
+                  <select class="ct-select" id="ct-budget" name="budget">
+                    <option value="">Select budget</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="ct-field ct-field--full">
+                <label class="ct-label" for="ct-description">Project Description <span class="ct-required">*</span></label>
+                <textarea class="ct-textarea" id="ct-description" name="description" required
+                  placeholder="Tell us about your idea, requirements and goals."></textarea>
+                <span class="ct-field-error" data-error="description"></span>
+              </div>
+
+              <div class="ct-form-row">
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-timeline">Timeline</label>
+                  <select class="ct-select" id="ct-timeline" name="timeline">
+                    <option value="">Select timeline</option>
+                  </select>
+                </div>
+                <div class="ct-field">
+                  <label class="ct-label" for="ct-referral">How did you hear about us?</label>
+                  <select class="ct-select" id="ct-referral" name="referral">
+                    <option value="">Select source</option>
+                  </select>
+                </div>
+              </div>
+
+              <input type="hidden" id="ct-source-page" name="source_page" value="">
+              <input type="hidden" id="ct-inquiry-type" name="inquiry_type" value="general">
+
+              <button type="submit" class="ct-submit ct-btn-magnetic" data-magnetic id="ct-submit-btn">
+                <span class="ct-submit-text">Send Project Request</span>
+                <span class="ct-submit-spinner" aria-hidden="true"></span>
+              </button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY WORK WITH AUROZE -->
+    <section class="ct-bento-section">
+      <div class="ct-container">
+        <div class="ct-section-head ct-section-head--center" data-reveal>
+          <p class="ct-eyebrow">WHY AUROZE</p>
+          <h2 class="ct-section-title">Why Work With Auroze</h2>
+          <p class="ct-section-sub">A premium technology partner built for ambitious brands and growing businesses.</p>
+        </div>
+        <div class="ct-bento-grid" id="ct-bento-mount"></div>
+      </div>
+    </section>
+
+    <!-- PROCESS -->
+    <section class="ct-process-section">
+      <div class="ct-container">
+        <div class="ct-section-head ct-section-head--center" data-reveal>
+          <p class="ct-eyebrow">OUR APPROACH</p>
+          <h2 class="ct-section-title">How We Start</h2>
+        </div>
+        <div class="ct-process-timeline" id="ct-process-mount"></div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="ct-faq-section">
+      <div class="ct-container">
+        <div class="ct-section-head ct-section-head--center" data-reveal>
+          <p class="ct-eyebrow">FAQ</p>
+          <h2 class="ct-section-title">Common Questions</h2>
+        </div>
+        <div class="ct-faq-list" id="ct-faq-mount"></div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="ct-final-cta" id="ct-cta">
+      <div class="ct-container">
+        <div class="ct-final-inner" data-reveal>
+          <h2 class="ct-final-title">Ready To Start Your Next Digital Journey?</h2>
+          <div class="ct-final-actions">
+            <a href="#contact-form" class="ct-btn-primary ct-btn-magnetic" data-magnetic>Send Inquiry</a>
+            <a href="projects.html" class="ct-btn-secondary ct-btn-magnetic" data-magnetic>Explore Our Work</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-section" id="contact">
+    <div class="footer-smoke-overlay"></div>
+    <div class="footer-container">
+      <div class="footer-top-row">
+        <h2 class="footer-headline">Ready to build<br>something bold?</h2>
+        <a href="mailto:info@auroze.com" class="cta-collab">
+          <span class="cta-text">START A COLLABORATION</span>
+          <span class="cta-arrow">→</span>
+          <span class="underline-line"></span>
+        </a>
+      </div>
+      <div class="footer-middle-row">
+        <div class="footer-left-col">
+          <div class="footer-copyright">© AUROZE® 2026</div>
+          <div class="footer-instruction">HOVER THE LINES.</div>
+        </div>
+        <div class="footer-right-col">
+          <div class="footer-info-col">
+            <div class="info-label">BUSINESS ENQUIRY</div>
+            <div class="info-val"><span class="prefix">E.</span> info@auroze.com</div>
+            <div class="info-val"><span class="prefix">P.</span> 0762646376</div>
+          </div>
+          <div class="footer-info-col">
+            <div class="info-label">SOCIAL</div>
+            <div class="social-grid">
+              <a href="https://www.linkedin.com/in/krushanth19/?skipRedirect=true" class="social-link" target="_blank" rel="noopener noreferrer">
+                <svg class="social-link-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 9h3v10H5V9zm1.5-4a2 2 0 110 4 2 2 0 010-4zM10 9h3v1.4h.05c.55-1 1.8-2.1 3.7-2.1 3.9 0 4.6 2.6 4.6 6v4.7h-3v-4.5c0-1.1 0-2.6-1.6-2.6-1.7 0-1.9 1.3-1.9 2.5v4.6H10V9z" fill="currentColor"/></svg>
+                <span>Linkedin</span>
+              </a>
+              <a href="https://web.facebook.com/profile.php?id=61591792293311" class="social-link" target="_blank" rel="noopener noreferrer">
+                <svg class="social-link-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 8h2.5V5H14c-2.5 0-4 1.5-4 4v2H7v3h2.5v7H14v-7h2.5l.5-3H14V8.6c0-.8.2-1.5 1.5-1.5z" fill="currentColor"/></svg>
+                <span>Facebook</span>
+              </a>
+              <a href="https://www.instagram.com/aurozehq/" class="social-link" target="_blank" rel="noopener noreferrer">
+                <svg class="social-link-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3.8" stroke="currentColor" stroke-width="1.6"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor"/></svg>
+                <span>Instagram</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-wordmark-container">
+        <canvas id="footer-lines-canvas"></canvas>
+      </div>
+    </div>
+  </footer>
+
+  <div class="cookie-banner" id="cookie-banner">
+    <span class="cookie-text">WE USE COOKIES TO ENHANCE YOUR EXPERIENCE.</span>
+    <div class="cookie-actions">
+      <button class="cookie-btn btn-decline" id="cookie-decline">DECLINE</button>
+      <button class="cookie-btn btn-accept" id="cookie-accept">ACCEPT</button>
+    </div>
+  </div>
+
+  <div class="menu-overlay" id="menu-overlay">
+    <div class="overlay-background"></div>
+    <div class="overlay-header">
+      <a href="index.html" class="logo">
+        <div class="logo-wrap">
+          <svg class="logo-mark" viewBox="200 150 630 560" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M 494 165 L 210 698 L 348 698 L 370 657 L 283 657 L 283 653 L 497 257 L 567 373 L 617 373 Z M 453 400 L 428 447 L 549 447 L 550 449 L 387 698 L 551 699 L 560 685 L 820 688 L 796 646 L 529 644 L 519 658 L 468 658 L 635 400 Z"
+              fill="#d9d9d9" fill-rule="evenodd" />
+          </svg>
+        </div>
+        <span class="wordmark">AUROZE</span>
+      </a>
+      <button class="menu-close" id="menu-close" aria-label="Close menu">
+        <span>CLOSE</span>
+        <div class="close-icon">
+          <span class="cross cross-1"></span>
+          <span class="cross cross-2"></span>
+        </div>
+      </button>
+    </div>
+    <nav class="overlay-nav">
+      <ul>
+        <li><a href="projects.html" class="nav-item" data-bg-img="work"><span class="nav-number">01</span> <span class="nav-label">WORK</span></a></li>
+        <li><a href="about.html" class="nav-item" data-bg-img="about"><span class="nav-number">02</span> <span class="nav-label">ABOUT</span></a></li>
+        <li><a href="services.html" class="nav-item" data-bg-img="services"><span class="nav-number">03</span> <span class="nav-label">SERVICES</span></a></li>
+        <li><a href="contact.html" class="nav-item is-active" data-bg-img="contact"><span class="nav-number">04</span> <span class="nav-label">CONTACT</span></a></li>
+      </ul>
+    </nav>
+    <div class="overlay-footer">
+      <div class="social-links">
+        <a href="https://web.facebook.com/profile.php?id=61591792293311" class="social-item" target="_blank" rel="noopener noreferrer">FACEBOOK</a>
+        <a href="https://www.instagram.com/aurozehq/" class="social-item" target="_blank" rel="noopener noreferrer">INSTAGRAM</a>
+        <a href="https://www.linkedin.com/in/krushanth19/?skipRedirect=true" class="social-item" target="_blank" rel="noopener noreferrer">LINKEDIN</a>
+      </div>
+      <div class="office-location"><span>CREATIVE OUTPOST — NY / LON / BLR</span></div>
+    </div>
+  </div>
+
+  <script type="module" src="contact.js"></script>
+</body>
+
+</html>

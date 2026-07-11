@@ -10,6 +10,7 @@ import {
 
 document.addEventListener('DOMContentLoaded', () => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IS_MOBILE_PERF = window.innerWidth <= 768;
 
   initSharedUI();
   renderContent();
@@ -21,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!reducedMotion) {
     gsap.registerPlugin(ScrollTrigger);
     gsap.config({ force3D: true });
-    gsap.ticker.lagSmoothing(600, 40);
+    gsap.ticker.lagSmoothing(IS_MOBILE_PERF ? 1200 : 600, IS_MOBILE_PERF ? 80 : 40);
     initPageTransition();
     initHeroParticles();
     initRevealAnimations();
@@ -142,12 +143,15 @@ function initHeroParticles() {
 
   const ctx = canvas.getContext('2d');
   let particles = [];
+  let rafId = null;
+  let active = false;
+  const particleCount = window.innerWidth <= 768 ? 14 : 24;
 
   const resize = () => {
     const rect = section.getBoundingClientRect();
     canvas.width = rect.width;
     canvas.height = rect.height;
-    particles = Array.from({ length: 24 }, () => ({
+    particles = Array.from({ length: particleCount }, () => ({
       x: Math.random() * rect.width,
       y: Math.random() * rect.height,
       r: Math.random() * 1.2 + 0.4,
@@ -156,10 +160,19 @@ function initHeroParticles() {
   };
 
   resize();
-  window.addEventListener('resize', resize);
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 150);
+  });
 
   let tick = 0;
   const draw = () => {
+    if (!active || document.hidden) {
+      rafId = null;
+      return;
+    }
+
     tick += 0.008;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     particles.forEach((p) => {
@@ -169,9 +182,27 @@ function initHeroParticles() {
       ctx.fillStyle = `rgba(255, 95, 0, ${a})`;
       ctx.fill();
     });
-    requestAnimationFrame(draw);
+    rafId = requestAnimationFrame(draw);
   };
-  draw();
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const observer = new IntersectionObserver(([entry]) => {
+      active = entry.isIntersecting;
+      if (active && !document.hidden && !rafId) draw();
+      if (!active && rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    }, { rootMargin: '60px' });
+    observer.observe(section);
+  } else {
+    active = true;
+    draw();
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && active && !rafId) draw();
+  });
 }
 
 function initScrollProgress() {

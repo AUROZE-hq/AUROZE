@@ -1,6 +1,8 @@
 import { init3DScene } from './scene3d.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const IS_MOBILE_PERF = window.innerWidth <= 768;
+
   // Initialize the 3D WebGL Monolith Scene in the background
   init3DScene();
 
@@ -406,9 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Core UI Elements
-  const soundToggleBtn = document.querySelector('.sound-toggle');
-  const soundOnIcon = document.querySelector('.sound-on');
-  const soundOffIcon = document.querySelector('.sound-off');
   const menuToggleBtn = document.querySelector('.menu-toggle');
   const menuCloseBtn = document.querySelector('.menu-close');
   const menuOverlay = document.querySelector('#menu-overlay');
@@ -523,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Generate static star-like floating logo elements
-  const starsCount = 40;
+  const starsCount = IS_MOBILE_PERF ? 14 : 40;
   const stars = [];
   for (let i = 0; i < starsCount; i++) {
     stars.push({
@@ -536,8 +535,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  let bgRafId = null;
+  let bgAnimActive = true;
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && bgAnimActive && !bgRafId) drawBackground();
+  });
+
   // Draw loop for background canvas
   const drawBackground = () => {
+    if (!bgAnimActive || document.hidden) {
+      bgRafId = null;
+      return;
+    }
+
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
@@ -558,7 +569,9 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.translate(x, y);
       ctx.rotate(star.phase * 0.15 + star.rotOffset);
       ctx.globalAlpha = opacity;
-      ctx.drawImage(logoImg, -star.size / 2, -star.size / 2, star.size, star.size);
+      if (logoImg.complete) {
+        ctx.drawImage(logoImg, -star.size / 2, -star.size / 2, star.size, star.size);
+      }
       ctx.restore();
     });
 
@@ -583,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.stroke();
     });
 
-    requestAnimationFrame(drawBackground);
+    bgRafId = requestAnimationFrame(drawBackground);
   };
 
   drawBackground();
@@ -657,40 +670,6 @@ document.addEventListener('DOMContentLoaded', () => {
     lfo.start();
   };
 
-  const toggleSound = () => {
-    if (!audioCtx) {
-      initAudio();
-    }
-
-    // Resume context if suspended (browser security block)
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
-    if (!soundEnabled) {
-      // Fade in drone
-      mainGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-      mainGainNode.gain.setValueAtTime(mainGainNode.gain.value, audioCtx.currentTime);
-      mainGainNode.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 1.5); // soft rumble level
-
-      soundOnIcon.classList.remove('hidden');
-      soundOffIcon.classList.add('hidden');
-      soundToggleBtn.style.borderColor = 'var(--accent-orange)';
-      soundEnabled = true;
-    } else {
-      // Fade out drone
-      mainGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
-      mainGainNode.gain.setValueAtTime(mainGainNode.gain.value, audioCtx.currentTime);
-      mainGainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.2);
-
-      soundOnIcon.classList.add('hidden');
-      soundOffIcon.classList.remove('hidden');
-      soundToggleBtn.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-      soundEnabled = false;
-    }
-  };
-
-  soundToggleBtn.addEventListener('click', toggleSound);
 
   // ==========================================
   // 6. PROXIMITY AUDIO MODULATION ("DARE TO TOUCH")
@@ -734,9 +713,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // 7. INTERACTIVE LOGO HOVER SPARK EFFECT
   // ==========================================
   const sparksCanvas = document.getElementById('logo-sparks-canvas');
+  if (sparksCanvas) {
   const sparksCtx = sparksCanvas.getContext('2d');
   let logoSparks = [];
   const maxLogoSparks = 50;
+  let sparksRafId = null;
 
   sparksCanvas.width = 100;
   sparksCanvas.height = 100;
@@ -762,6 +743,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const updateLogoSparks = () => {
+    if (logoSparks.length === 0) {
+      sparksRafId = null;
+      return;
+    }
+
     sparksCtx.clearRect(0, 0, 100, 100);
 
     for (let i = logoSparks.length - 1; i >= 0; i--) {
@@ -780,12 +766,15 @@ document.addEventListener('DOMContentLoaded', () => {
         sparksCtx.fill();
       }
     }
-    requestAnimationFrame(updateLogoSparks);
+    sparksRafId = requestAnimationFrame(updateLogoSparks);
   };
 
-  updateLogoSparks();
+  const queueSparkUpdate = () => {
+    if (!sparksRafId) sparksRafId = requestAnimationFrame(updateLogoSparks);
+  };
 
   const logoContainer = document.querySelector('.logo');
+  if (logoContainer) {
   logoContainer.addEventListener('mousemove', (e) => {
     const rect = sparksCanvas.getBoundingClientRect();
     const mX = ((e.clientX - rect.left) / rect.width) * 100;
@@ -794,13 +783,17 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < 2; i++) {
       addLogoSpark(mX, mY);
     }
+    queueSparkUpdate();
   });
 
   logoContainer.addEventListener('mouseenter', () => {
     for (let i = 0; i < 12; i++) {
       addLogoSpark(50, 50);
     }
+    queueSparkUpdate();
   });
+  }
+  }
 
   // ==========================================
   // 8. SCROLL EFFECTS: CENTERPIECE FADE
@@ -809,9 +802,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const heroContent = document.querySelector('.hero-content');
   const aboutSection = document.querySelector('.about-section');
 
+  let scrollFxPending = false;
   const handleScrollEffects = () => {
     const scrollY = window.scrollY;
     const viewHeight = window.innerHeight;
+
+    if (IS_MOBILE_PERF) {
+      const shouldRunBg = scrollY < viewHeight * 2;
+      if (bgAnimActive !== shouldRunBg) {
+        bgAnimActive = shouldRunBg;
+        if (shouldRunBg && !bgRafId) drawBackground();
+      }
+    }
 
     if (centerpieceLogo || heroContent) {
       const fadeProgress = Math.max(0, Math.min(1, scrollY / (viewHeight * 0.5)));
@@ -837,11 +839,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // 9. ABOUT SECTION — PREMIUM GSAP SCROLL ANIMATIONS
   gsap.registerPlugin(ScrollTrigger);
 
-  const smoothScrub = (value) => +(value * 1.2).toFixed(2);
+  const smoothScrub = (value) => +(value * (IS_MOBILE_PERF ? 1.38 : 1.2)).toFixed(2);
 
   if (!reducedMotion) {
     gsap.config({ force3D: true });
-    gsap.ticker.lagSmoothing(600, 40);
+    gsap.ticker.lagSmoothing(IS_MOBILE_PERF ? 1200 : 600, IS_MOBILE_PERF ? 80 : 40);
   }
 
   const initSloganMagicHover = () => {
@@ -1077,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const scrollLength = isMobile ? '+=280%' : '+=400%';
-    const scrubAmount = smoothScrub(isMobile ? 0.68 : 1.25);
+    const scrubAmount = smoothScrub(isMobile ? 0.82 : 1.25);
     const revealAt = isMobile
       ? { divider: 1.0, slogans: 1.22, mission: 1.38, cta: 1.54, hold: 1.88, end: 3.0 }
       : { video: 0, slogans: 1.72, mission: 2.0, cta: 2.22, hold: 2.6, end: 4.2 };
@@ -1895,7 +1897,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rect = factsSection.getBoundingClientRect();
         width = particleCanvas.width = Math.floor(rect.width);
         height = particleCanvas.height = Math.floor(rect.height);
-        const count = window.innerWidth <= 600 ? 18 : 32;
+        const count = window.innerWidth <= 600 ? 10 : (IS_MOBILE_PERF ? 16 : 32);
         particles = Array.from({ length: count }, () => ({
           x: Math.random() * width,
           y: Math.random() * height,
@@ -2199,7 +2201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const resize = () => {
       const rect = section.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, isMobileLightning ? 1.5 : 2);
+      dpr = Math.min(window.devicePixelRatio || 1, isMobileLightning ? 1 : 2);
       width = Math.max(1, Math.floor(rect.width));
       height = Math.max(1, Math.floor(rect.height));
       canvas.width = Math.floor(width * dpr);
@@ -2677,6 +2679,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const offscreen = document.createElement('canvas');
     const oCtx = offscreen.getContext('2d');
 
+    let cachedPixels = null;
+
     const renderTextToOffscreen = () => {
       offscreen.width = width;
       offscreen.height = height;
@@ -2691,15 +2695,20 @@ document.addEventListener('DOMContentLoaded', () => {
       oCtx.textAlign = 'center';
       oCtx.textBaseline = 'middle';
       oCtx.fillText('AUROZE', width / 2, height / 2);
+      cachedPixels = oCtx.getImageData(0, 0, width, height).data;
     };
 
     renderTextToOffscreen();
 
+    let resizeFooterTimer;
     window.addEventListener('resize', () => {
       if (!canvas) return;
-      width = canvas.width = canvas.offsetWidth;
-      height = canvas.height = canvas.offsetHeight;
-      renderTextToOffscreen();
+      clearTimeout(resizeFooterTimer);
+      resizeFooterTimer = setTimeout(() => {
+        width = canvas.width = canvas.offsetWidth;
+        height = canvas.height = canvas.offsetHeight;
+        renderTextToOffscreen();
+      }, 150);
     });
 
     let mouseX = -1000;
@@ -2755,10 +2764,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let lastNoteTime = 0;
     const triggerFooterSynth = (mX, mY) => {
-      // Check if global sound is enabled (by checking sound button border color)
-      const soundBtn = document.querySelector('.sound-toggle');
-      const isSoundEnabled = soundBtn && soundBtn.style.borderColor.includes('255, 95, 0');
-      if (!isSoundEnabled) return;
+      return;
 
       if (!synthCtx) {
         initSynth();
@@ -2811,17 +2817,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render Canvas animation loop
     let tick = 0;
+    let footerRafId = null;
+    let footerActive = false;
+
     const drawScanlines = () => {
+      if (!footerActive || document.hidden || !cachedPixels) {
+        footerRafId = null;
+        return;
+      }
+
       ctx.fillStyle = '#050505';
       ctx.fillRect(0, 0, width, height);
 
-      // Get offscreen pixels data
-      const imgData = oCtx.getImageData(0, 0, width, height);
-      const pixels = imgData.data;
+      const pixels = cachedPixels;
 
       // Render configuration
-      const lineGap = isMobile ? 8 : 6;
-      const segmentLen = 4;
+      const lineGap = isMobile ? 10 : 6;
+      const segmentLen = isMobile ? 6 : 4;
 
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
       ctx.lineWidth = 1;
@@ -2878,10 +2890,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      requestAnimationFrame(drawScanlines);
+      footerRafId = requestAnimationFrame(drawScanlines);
     };
 
-    drawScanlines();
+    if (typeof IntersectionObserver !== 'undefined') {
+      const footerObserver = new IntersectionObserver(([entry]) => {
+        footerActive = entry.isIntersecting;
+        if (footerActive && !document.hidden && !footerRafId) drawScanlines();
+        if (!footerActive && footerRafId) {
+          cancelAnimationFrame(footerRafId);
+          footerRafId = null;
+        }
+      }, { rootMargin: '100px' });
+      footerObserver.observe(canvas);
+    } else {
+      footerActive = true;
+      drawScanlines();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && footerActive && !footerRafId) drawScanlines();
+    });
   };
 
   initFooterCanvas();
@@ -3104,8 +3133,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 4.85);
   }
 
+  const onScroll = () => {
+    if (scrollFxPending) return;
+    scrollFxPending = true;
+    requestAnimationFrame(() => {
+      scrollFxPending = false;
+      handleScrollEffects();
+    });
+  };
+
   // Run scroll handler on scroll, and initially once to lock baseline values
-  window.addEventListener('scroll', handleScrollEffects, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
   handleScrollEffects();
 });
 

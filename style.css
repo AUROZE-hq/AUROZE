@@ -5979,22 +5979,39 @@ body:not(.light-theme-active) .services-eyebrow {
 }
 
 .social-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.social-grid a {
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   text-decoration: none;
   font-family: var(--font-ui);
   font-size: 13px;
-  font-weight: 300;
+  font-weight: 400;
   color: var(--text-white);
-  transition: color 0.3s ease;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.social-grid a:hover {
+.social-link:hover {
   color: var(--accent-orange);
+  transform: translateX(3px);
+}
+
+.social-link-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: rgba(255, 95, 0, 0.85);
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-link:hover .social-link-icon {
+  color: var(--accent-orange);
+  transform: scale(1.08);
 }
 
 /* Bottom Half: Giant Interactive Wordmark */
@@ -6965,5 +6982,29 @@ body:not(.light-theme-active) .services-eyebrow {
 
   .stories-headline {
     font-size: clamp(26px, 7.5vw, 32px);
+  }
+
+  /* Scroll & paint performance — mobile only */
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .about-section,
+  .key-facts-section,
+  .selected-work-section,
+  .services-section,
+  .stories-section {
+    contain: layout style;
+  }
+
+  #bg-canvas,
+  #logo-sparks-canvas,
+  #footer-lines-canvas {
+    contain: strict;
   }
 }
