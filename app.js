@@ -4,6 +4,60 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize the 3D WebGL Monolith Scene
   init3DScene();
 
+  // ==========================================
+  // CENTERPIECE LOGO WOOFER EFFECT
+  // ==========================================
+  const cpLogo = document.querySelector('.centerpiece-logo');
+  const hoverIndicator = document.querySelector('.hover-direction-indicator span');
+
+  if (cpLogo) {
+    const mainSvg = cpLogo.querySelector('.centerpiece-logo-svg');
+    if (mainSvg) {
+      // Create main logo wrapper to hold the vibrating face logo
+      const mainWrapper = document.createElement('div');
+      mainWrapper.className = 'logo-main';
+      mainSvg.parentNode.insertBefore(mainWrapper, mainSvg);
+      mainWrapper.appendChild(mainSvg);
+
+      // Create 5 trailing outline layers underneath the main logo
+      for (let i = 5; i >= 1; i--) {
+        const trailDiv = document.createElement('div');
+        trailDiv.className = `logo-trail logo-trail-${i}`;
+        const clonedSvg = mainSvg.cloneNode(true);
+        // Remove animation class inside clone to prevent duplicate sweeps
+        const clonedShine = clonedSvg.querySelector('.shine-bar');
+        if (clonedShine) clonedShine.remove();
+        trailDiv.appendChild(clonedSvg);
+        cpLogo.insertBefore(trailDiv, mainWrapper);
+      }
+    }
+
+    // Determine hover direction based on mouse position relative to logo center
+    cpLogo.addEventListener('mousemove', (e) => {
+      const rect = cpLogo.getBoundingClientRect();
+      const relativeX = e.clientX - rect.left;
+      const midPoint = rect.width / 2;
+
+      if (relativeX > midPoint) {
+        cpLogo.classList.remove('trail-left');
+        cpLogo.classList.add('trail-right');
+        if (hoverIndicator) {
+          hoverIndicator.textContent = '← HOVER RIGHT';
+        }
+      } else {
+        cpLogo.classList.remove('trail-right');
+        cpLogo.classList.add('trail-left');
+        if (hoverIndicator) {
+          hoverIndicator.textContent = '← HOVER LEFT';
+        }
+      }
+    });
+
+    cpLogo.addEventListener('mouseleave', () => {
+      cpLogo.classList.remove('trail-left', 'trail-right');
+    });
+  }
+
   // Core UI Elements
   const soundToggleBtn = document.querySelector('.sound-toggle');
   const soundOnIcon = document.querySelector('.sound-on');

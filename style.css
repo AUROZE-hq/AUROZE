@@ -1099,25 +1099,105 @@ body.light-theme .wordmark {
 }
 
 /* Hover: Premium 3D Perspective rotation + layered shadows to simulate extrusion */
-.centerpiece-logo:hover {
-  transform: perspective(900px) rotateX(16deg) rotateY(-18deg) translateZ(30px) scale(1.06);
+/* Woofer vibration animation */
+@keyframes woofer-vibrate {
+  0% { transform: scale(1.02) translate(0, 0); }
+  20% { transform: scale(1.02) translate(-1.5px, 1.5px); }
+  40% { transform: scale(1.02) translate(-1.5px, -1.5px); }
+  60% { transform: scale(1.02) translate(2px, 0.5px); }
+  80% { transform: scale(1.02) translate(0.5px, -2px); }
+  100% { transform: scale(1.02) translate(-0.5px, 1px); }
 }
 
-.centerpiece-logo:hover .centerpiece-logo-svg {
-  filter:
-    drop-shadow(-1px 1px 0px #c0c0c0) drop-shadow(-2px 2px 0px #b0b0b0) drop-shadow(-3px 3px 0px #a8a8a8) drop-shadow(-4px 4px 12px rgba(0, 0, 0, 0.65));
+.logo-main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  pointer-events: none;
 }
 
-/* Text parallax shift: pops forward even more on hover than the logo icon with full 3D extrusion shadows */
+/* Vibrate the main logo when centerpiece logo is hovered */
+.centerpiece-logo:hover .logo-main {
+  animation: woofer-vibrate 0.08s infinite linear;
+}
+
+/* Trail layers styling */
+.logo-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(0, 0) scale(1);
+  mix-blend-mode: screen;
+  /* Smooth standard transition for retracting collapse on mouseleave */
+  transition: transform 0.55s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Stretched accordion drag curve on hover */
+.centerpiece-logo:hover .logo-trail {
+  transition: transform 0.75s cubic-bezier(0.34, 1.25, 0.64, 1), opacity 0.5s ease-out;
+}
+
+.logo-trail-1 { transition-duration: 0.30s; }
+.logo-trail-2 { transition-duration: 0.40s; }
+.logo-trail-3 { transition-duration: 0.50s; }
+.logo-trail-4 { transition-duration: 0.60s; }
+.logo-trail-5 { transition-duration: 0.70s; }
+
+/* Right Trail Offset (45 degrees up-right) and Opacity values */
+.centerpiece-logo.trail-right .logo-trail-1 { transform: translate(16px, -16px) scale(0.98); opacity: 0.6; }
+.centerpiece-logo.trail-right .logo-trail-2 { transform: translate(32px, -32px) scale(0.96); opacity: 0.4; }
+.centerpiece-logo.trail-right .logo-trail-3 { transform: translate(48px, -48px) scale(0.94); opacity: 0.25; }
+.centerpiece-logo.trail-right .logo-trail-4 { transform: translate(64px, -64px) scale(0.92); opacity: 0.12; }
+.centerpiece-logo.trail-right .logo-trail-5 { transform: translate(80px, -80px) scale(0.90); opacity: 0.05; }
+
+/* Left Trail Offset (45 degrees up-left) and Opacity values */
+.centerpiece-logo.trail-left .logo-trail-1 { transform: translate(-16px, -16px) scale(0.98); opacity: 0.6; }
+.centerpiece-logo.trail-left .logo-trail-2 { transform: translate(-32px, -32px) scale(0.96); opacity: 0.4; }
+.centerpiece-logo.trail-left .logo-trail-3 { transform: translate(-48px, -48px) scale(0.94); opacity: 0.25; }
+.centerpiece-logo.trail-left .logo-trail-4 { transform: translate(-64px, -64px) scale(0.92); opacity: 0.12; }
+.centerpiece-logo.trail-left .logo-trail-5 { transform: translate(-80px, -80px) scale(0.90); opacity: 0.05; }
+
+/* Hover scale-up for centerpiece wordmark */
 .centerpiece-logo:hover .centerpiece-wordmark {
-  transform: translateX(-50%) translateZ(60px) rotateX(5deg);
-  text-shadow: 
-    -1px 1px 0px #c0c0c0, 
-    -2px 2px 0px #b0b0b0, 
-    -3px 3px 0px #a8a8a8, 
-    -4px 4px 0px #909090, 
-    -5px 5px 0px #808080, 
-    -6px 6px 15px rgba(0, 0, 0, 0.7);
+  transform: translateX(-50%) translateZ(15px) scale(1.02);
+  text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Hover indicator styling at top right */
+.hover-direction-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  color: var(--text-white);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: border-color 0.4s ease, color 0.4s ease, background-color 0.4s ease;
+  margin-left: 15px;
+}
+
+body.light-theme-active .hover-direction-indicator {
+  border-color: rgba(26, 26, 26, 0.15);
+  color: #1a1a1a;
+}
+
+@media (max-width: 900px) {
+  .hover-direction-indicator {
+    display: none;
+  }
 }
 
 /* Continuous shine sweep animation inside centerpiece logo */
