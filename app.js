@@ -4,6 +4,126 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize the 3D WebGL Monolith Scene
   init3DScene();
 
+  // ==========================================
+  // CENTERPIECE LOGO WOOFER EFFECT
+  // ==========================================
+  const cpWrapper = document.querySelector('.centerpiece-logo-wrapper');
+  const cpLogo = document.querySelector('.centerpiece-logo');
+
+  if (cpWrapper && cpLogo && window.innerWidth > 900) {
+    const mainSvg = cpLogo.querySelector('.centerpiece-logo-svg');
+    if (mainSvg) {
+      // Create main logo wrapper to hold the vibrating face logo
+      const mainWrapper = document.createElement('div');
+      mainWrapper.className = 'logo-main';
+      mainSvg.parentNode.insertBefore(mainWrapper, mainSvg);
+      mainWrapper.appendChild(mainSvg);
+
+      // Create 5 trailing outline layers underneath the main logo
+      for (let i = 5; i >= 1; i--) {
+        const trailDiv = document.createElement('div');
+        trailDiv.className = `logo-trail logo-trail-${i}`;
+        const clonedSvg = mainSvg.cloneNode(true);
+        // Remove animation class inside clone to prevent duplicate sweeps
+        const clonedShine = clonedSvg.querySelector('.shine-bar');
+        if (clonedShine) clonedShine.remove();
+        trailDiv.appendChild(clonedSvg);
+        cpLogo.insertBefore(trailDiv, mainWrapper);
+      }
+    }
+
+    let targetProgress = 0;
+    let currentProgress = 0;
+    let isHovered = false;
+    let animFrameId = null;
+    const ease = 0.08; // smooth liquid easing
+    const opacities = [0.6, 0.4, 0.25, 0.12, 0.05];
+
+    function updateLerpRotation() {
+      if (isHovered) {
+        currentProgress += (targetProgress - currentProgress) * ease;
+      } else {
+        currentProgress += (0 - currentProgress) * ease;
+        if (Math.abs(currentProgress) < 0.005) {
+          currentProgress = 0;
+          cpLogo.style.transform = '';
+          cpLogo.style.transition = '';
+          // Reset trail layers
+          for (let i = 1; i <= 5; i++) {
+            const trail = cpLogo.querySelector(`.logo-trail-${i}`);
+            if (trail) {
+              trail.style.transform = '';
+              trail.style.opacity = '';
+            }
+          }
+          animFrameId = null;
+          return;
+        }
+      }
+
+      const rotationY = currentProgress * 30; // max 30deg Y-rotation
+      // Trail progress starts after a 25% threshold of the rotation turn
+      const trailProgress = Math.max(0, (Math.abs(currentProgress) - 0.25) / 0.75);
+
+      // Jitter shake is proportional to trail progress (stronger at the outer edges, zero at center)
+      const jitterX = isHovered ? (Math.random() - 0.5) * 4 * trailProgress : 0;
+      const jitterY = isHovered ? (Math.random() - 0.5) * 4 * trailProgress : 0;
+      // Main logo scales down proportionally (gets smaller) as it turns and vibrates
+      const logoScale = 1 - 0.12 * Math.abs(currentProgress);
+
+      cpLogo.style.transform = `rotateY(${rotationY.toFixed(2)}deg) translate(${jitterX.toFixed(2)}px, ${jitterY.toFixed(2)}px) scale(${logoScale.toFixed(3)})`;
+      cpLogo.style.transition = 'none'; // bypass transition conflicts
+
+      // Update trail layers proportionally
+      for (let i = 1; i <= 5; i++) {
+        const trail = cpLogo.querySelector(`.logo-trail-${i}`);
+        if (trail) {
+          const trailX = -Math.sign(currentProgress) * trailProgress * 16 * i;
+          const trailY = -trailProgress * 16 * i;
+          const scale = 1 - (0.02 * i);
+          const opacity = opacities[i - 1] * trailProgress;
+
+          trail.style.transform = `translate(${trailX.toFixed(2)}px, ${trailY.toFixed(2)}px) scale(${scale})`;
+          trail.style.opacity = opacity.toFixed(3);
+          trail.style.transition = 'none';
+        }
+      }
+
+      animFrameId = requestAnimationFrame(updateLerpRotation);
+    }
+
+    // Determine hover direction based on mouse position relative to wrapper center
+    cpWrapper.addEventListener('mousemove', (e) => {
+      const rect = cpWrapper.getBoundingClientRect();
+      const relativeX = e.clientX - rect.left;
+      const midPoint = rect.width / 2;
+
+      // Set target progress between -1 (left edge) and 1 (right edge)
+      const progress = (relativeX / rect.width) * 2 - 1;
+      targetProgress = Math.max(-1, Math.min(1, progress));
+      isHovered = true;
+
+      if (!animFrameId) {
+        animFrameId = requestAnimationFrame(updateLerpRotation);
+      }
+
+      if (relativeX > midPoint) {
+        // Hovering right half of wrapper -> animate trail to the left
+        cpLogo.classList.remove('trail-right');
+        cpLogo.classList.add('trail-left');
+      } else {
+        // Hovering left half of wrapper -> animate trail to the right
+        cpLogo.classList.remove('trail-left');
+        cpLogo.classList.add('trail-right');
+      }
+    });
+
+    cpWrapper.addEventListener('mouseleave', () => {
+      isHovered = false;
+      cpLogo.classList.remove('trail-left', 'trail-right');
+    });
+  }
+
   // Core UI Elements
   const soundToggleBtn = document.querySelector('.sound-toggle');
   const soundOnIcon = document.querySelector('.sound-on');
